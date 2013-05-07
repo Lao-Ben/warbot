@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="C:/Users/Thibault/Documents/EPITA/SYMA/projet/MadKit-4.2.0/lib/madkitapplet.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Thibault/Documents/EPITA/SYMA/projet/MadKit-4.2.0/lib/madkitkernel.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Thibault/Documents/EPITA/SYMA/projet/MadKit-4.2.0/lib/madkitutils.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Thibault/Documents/EPITA/SYMA/projet/MadKit-4.2.0/lib/warbot.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

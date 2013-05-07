@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE formalism SYSTEM "sedit-formalism.dtd">
+<formalism name="vk" description=""
+	   class="madkit.VisualKit.VkStructure">
+  <formalism-info>
+    <author>Gregory Bedel-Navarro</author>
+    <author>Gregory Garbin</author>
+  </formalism-info>
+  <node-types>
+    <node-desc name="state" class="madkit.VisualKit.VkState">
+      <icon url="images/place1.gif"/>
+	<action description="Definition">
+		<java-method name="definition" />
+	</action>
+    </node-desc>
+<node-desc name="transition" class="madkit.VisualKit.VKTransition">
+      <icon url="images/transition2.gif"/>
+      <graphic-element class="SEdit.Graphics.GRectangle">
+	<property name="width">10</property>
+	<property name="height">40</property>
+      </graphic-element>
+      <action description="Definition">
+	<java-method name="definition"/>
+      </action>
+    </node-desc>
+  </node-types>
+  <arrow-types>
+    <arrow-desc name="link" class="madkit.VisualKit.VkLink">
+      <icon url="images/stdarrow.gif"/>
+      <graphic-element >
+		<property name="displaylabel">true</property>
+      </graphic-element>
+	<action description="Define Priority">
+	<java-method name="definition"/>
+      </action>
+    </arrow-desc>
+  </arrow-types>
+  <action description="Globals">
+    <icon url="images/editor24.gif"/>
+    <java-method name="showGlobals"/>
+  </action>
+  <action description="Compiler">
+    <icon url="images/editor24.gif"/>
+    <java-method name="compiler"/>
+  </action>
+</formalism>
