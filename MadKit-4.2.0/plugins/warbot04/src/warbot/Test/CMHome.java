@@ -6,20 +6,13 @@ public class CMHome extends Brain
 {
 	String groupName="warbot-";
 	String roleName="Home";
-	int energyCreate = 0;
-	int energyToCreateRocket = 3;
-	int energyToCreateExplorer = 3;
 
 	public CMHome(){}
 	
-	public int getEnergyCreate()
-	{
-		return energyCreate;
-	}
-	
-	public void setEnergyCreate(int ener)
-	{
-		energyCreate = ener;
+	void eatFood(Food p){
+		if(distanceTo(p) < 2){
+			eat((Food)p);
+		}
 	}
 
 	public void activate()
@@ -46,6 +39,8 @@ public class CMHome extends Brain
 		String argLauncherY				= "";		// pour envoyer position relative en Y de l'ennemi
 		
 		
+
+		broadcast(groupName,"Explorer","basepos");
 		Percept[]objetsPercus = getPercepts();	// entités dans le périmètre de perception
 		
 		for(int i=0;i<objetsPercus.length;i++)  // pour toutes les entités perçues...
@@ -79,6 +74,11 @@ public class CMHome extends Brain
 					argLauncherY = Double.toString(objetCourant.getY());
 				}
 			}
+			if (objetCourant.getPerceptType().equals("Food")) // si nourriture
+			{
+				setUserMessage("eating");
+				eatFood((Food) objetCourant);
+			}
 			// on regarde le nombre de nos launchers "proches"
 			if (objetCourant.getTeam().equals(getTeam()) && objetCourant.getPerceptType().equals("RocketLauncher") && distanceTo(objetCourant) < distanceSecurite)	
 				nbAmisProches ++;
@@ -87,17 +87,10 @@ public class CMHome extends Brain
 		if (nbAmisProches <= nbEnnemisProches && nbEnnemisProches != 0)
 		{
 //			println("HELP ! nb ennemis : "+nbEnnemisProches);
-			if (energyCreate >= energyToCreateRocket)
-			{
-				createAgent("TestRocketLauncher");
-				energyCreate = energyCreate - energyToCreateRocket;
-			}
 			broadcast(groupName,"Launcher",actMessageAideL,argLauncherX,argLauncherY);
 		}
-		if (energyCreate >= energyToCreateExplorer)
-		{
-			createAgent("TestExplorer");
-			energyCreate = energyCreate - energyToCreateExplorer;
-		}
+
+		if (getResourceLevel() >= 400)
+			createAgent("TestRocketLauncher");
 	}
 }

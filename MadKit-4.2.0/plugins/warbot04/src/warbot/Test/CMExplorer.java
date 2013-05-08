@@ -14,6 +14,8 @@ public class CMExplorer extends Brain
 	int tempsMax		=8;
 	int temps			=tempsMax;	// variable permettant de garder la meme direction pendant tempsMax itérations
 	Percept myhome = null;
+	double homeX = 0;
+	double homeY = 0;
 	int cap = 0;
 	int i = 0;
 	List<double[]> tabfoodtake = new ArrayList<double[]>();
@@ -84,6 +86,11 @@ public class CMExplorer extends Brain
 				if (!tabfoodtakebyme.contains(d))
 					tabfoodtake.add(d);
 			}
+			if (messCourant.getAct() != null && messCourant.getAct() == "basepos")
+			{
+				homeX = messCourant.getFromX();
+				homeY = messCourant.getFromY();
+			}
 		}
 		
 		/*if (!isMoving() && myhome != null && bagSize() == getBagCapacity())
@@ -104,17 +111,15 @@ public class CMExplorer extends Brain
 			if (myhome == objetCourant)
 				break;
 		}
-		if (myhome != null && bagSize() == (getBagCapacity()))
+		if (bagSize() == getBagCapacity())
 		{
-			if(distanceTo(myhome) < 2){
+			if(myhome != null && distanceTo(myhome) < 2){
 	             setUserMessage("drop all");
 	             dropAll();
 	             setUserMessage((new Integer(this.bagSize())).toString());
-	             setHeading(towards(-myhome.getX(),-myhome.getY()));
-	             move();
 	             return;
 			} else {
-	             setHeading(towards(myhome.getX(),myhome.getY()));
+	             setHeading(towards(homeX,homeY));
 	             setUserMessage("going to base");
 	             move();
 	             return;
