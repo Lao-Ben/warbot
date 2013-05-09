@@ -10,7 +10,7 @@ public class CMHome extends Brain
 	public CMHome(){}
 	
 	void eatFood(Food p){
-		if(distanceTo(p) < 2){
+		if(distanceTo(p) < 3){
 			eat((Food)p);
 		}
 	}
@@ -18,7 +18,9 @@ public class CMHome extends Brain
 	public void activate()
 	{
 		groupName=groupName+getTeam();  // -> warbot-CM
-		println("Base Test opérationnelle");
+		println("Base Test opérationnelle");		
+		createGroup(false,groupName,null,null);
+		requestRole(groupName,roleName,null);
 	}
 
 	public void doIt()
@@ -29,6 +31,8 @@ public class CMHome extends Brain
 		int distanceSecurite 			= 150;		// périmètre de sécurité
 		int nbEnnemisProches 			= 0;
 		int nbAmisProches 				= 0;
+		int nbExplorer					= 0;
+		int nbLauncher					= 0;
 		
 		String actMessageAideL 			= "HELP-BL";// cas où risque d'attaque ennemie des launchers
 		String actMessageAideE 			= "HELP-BE";// cas où risque d'attaque ennemie car explorers rôdent
@@ -38,9 +42,24 @@ public class CMHome extends Brain
 		String argLauncherX				= "";		// pour envoyer position relative en X de l'ennemi
 		String argLauncherY				= "";		// pour envoyer position relative en Y de l'ennemi
 		
+		WarbotMessage messCourant	= null;
 		
-
+		while((messCourant = readMessage())!= null)
+		{
+			// message d'attaque de base ennemie : les coordonnées sont toujours présentes en argument du message
+			if(messCourant.getAct() != null && messCourant.getAct() == "ExplorerAlive")
+			{
+				nbExplorer++;
+			}
+			if(messCourant.getAct() != null && messCourant.getAct() == "LauncherAlive")
+			{
+				nbLauncher++;
+			}
+		}
+		setUserMessage(Integer.toString(nbExplorer));
+		
 		broadcast(groupName,"Explorer","basepos");
+		broadcast(groupName,"Launcher","basepos");
 		Percept[]objetsPercus = getPercepts();	// entités dans le périmètre de perception
 		
 		for(int i=0;i<objetsPercus.length;i++)  // pour toutes les entités perçues...
@@ -88,9 +107,18 @@ public class CMHome extends Brain
 		{
 //			println("HELP ! nb ennemis : "+nbEnnemisProches);
 			broadcast(groupName,"Launcher",actMessageAideL,argLauncherX,argLauncherY);
-		}
 
+			if (getResourceLevel() >= 400)
+				createAgent("TestRocketLauncher");
+			return;
+		}
 		if (getResourceLevel() >= 400)
-			createAgent("TestRocketLauncher");
+		{
+			if (nbLauncher > nbExplorer)
+				createAgent("TestExplorer");
+			else
+				createAgent("TestRocketLauncher");
+		}
+			
 	}
 }

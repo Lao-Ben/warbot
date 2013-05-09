@@ -166,6 +166,10 @@ public class CMRocketLauncher extends Brain
 				tabHelpE[3][comptHelpE] = messCourant.getFromY();
 				comptHelpE++;
 			}
+			if (messCourant.getAct() != null
+					&& messCourant.getAct() == "basepos") {
+				broadcast(groupName, "Home", "LauncherAlive");
+			}
 		}
 		tailleAtaq 	= comptAtaq;
 		tailleHelpBL = comptHelpBL;
