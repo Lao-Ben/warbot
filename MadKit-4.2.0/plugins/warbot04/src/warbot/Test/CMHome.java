@@ -6,7 +6,7 @@ public class CMHome extends Brain
 {
 	String groupName="warbot-";
 	String roleName="Home";
-
+	
 	public CMHome(){}
 	
 	void eatFood(Food p){
