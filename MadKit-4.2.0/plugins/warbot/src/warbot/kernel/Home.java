@@ -18,6 +18,7 @@
 */
 package warbot.kernel;
 
+import java.awt.geom.AffineTransform;
 import java.awt.Point;
 
 
@@ -101,13 +102,20 @@ public class Home extends BasicBody
 	    	        getStructure().getAgent().doCommand(new SEdit.NewNodeCommand(createWhat,new Point(0,0)));
 	    	        BasicBody r = (BasicBody)((WarbotStructure)getStructure()).getLastEntity();
 	    	        r.setHeading(Math.random()*360);
-	    	        r.setXY( (radius+r.getRadius()+1)*r.getCosAlpha()+x,(radius+r.getRadius()+1)*r.getSinAlpha()+y);
+	    	       // r.setXY( (radius+r.getRadius()+1)*r.getCosAlpha()+x,(radius+r.getRadius()+1)*r.getSinAlpha()+y);
+	    	        double[] pt = getPointToCreateAgent(r);
+	    	        if (pt == null)
+	    	        {
+	    	        	System.err.println(":: "+this+" cannot create " + createWhat + " : no free area to spot!");
+	    	        	return;
+	    	        }
+	    	        r.setXY(pt[0], pt[1]);
 	    	        resourcelevel -= RESOURCEUNIT;
     			} else {
     				this.setUserMessage("Resources are too low");
     			}
     		} catch(ClassCastException ex){
-    			System.err.println(":: "+this+" cannot create " + createWhat + " this is not an agent!");
+    			System.err.println(":: "+this+" cannot create " + createWhat + " : this is not an agent!");
     		} catch(Exception e){
     			System.err.println(":: "+this+ " error in creating a "+createWhat);
     			System.err.println(e.getMessage());
@@ -126,5 +134,47 @@ public class Home extends BasicBody
     	}
     }
 
-	
+    /**
+     * Find a free point aroud the home. 
+     * You can adjust precision and margin.
+     *  
+     * @param r the body of the agent being created
+     * @return return a position if it exists else return null
+     */
+    private double[] getPointToCreateAgent(BasicBody r)
+    {
+    	double precision = Math.PI / 16;
+    	int margin = 1;
+    	boolean collision;
+    	int minRadius = radius+r.getRadius()+1;
+    	double angle = 0;
+    	Percept[] percepts = getPercepts();    	
+    	double[] pt = {x+minRadius, y};
+    	
+    	for (int i = 0; i < 2*Math.PI; angle += precision) {
+        	AffineTransform.getRotateInstance(angle, x, y).transform(pt, 0, pt, 0, 1);
+	    	collision = false;
+//	    	System.err.println("getPointToCreateAgent -- point : " + pt[0] + "," + pt[1]); // debug
+        	for (Percept percept : percepts) {
+				if (!(percept instanceof Crossable))
+				{
+					// debug
+			    	//System.err.println("getPointToCreateAgent -- agent " + percept.getPerceptType() + " : " + (x + percept.x) + "," + (y + percept.y) + " ; " + percept.radius);
+			    	//System.err.println("getPointToCreateAgent -- intersect : "
+			    	//				+ (x + percept.x - (percept.getRadius() + margin)) + ","
+			    	//				+ (x - percept.x + (percept.getRadius() + margin)) + ","
+			    	//				+ (y + percept.y - (percept.getRadius() + margin)) + ","
+			    	//				+ (y - percept.y + (percept.getRadius() + margin)));
+					if(pt[0] + r.radius >= x + percept.x - (percept.getRadius() + margin)
+					&& pt[0] - r.radius <= x + percept.x + (percept.getRadius() + margin)
+					&& pt[1] + r.radius >= y + percept.y - (percept.getRadius() + margin)
+					&& pt[1] - r.radius <= y + percept.y + (percept.getRadius() + margin))
+						collision = true;
+				}
+			}
+        	if (!collision)
+        		return pt;
+    	}    	
+    	return null;
+    }
 }
