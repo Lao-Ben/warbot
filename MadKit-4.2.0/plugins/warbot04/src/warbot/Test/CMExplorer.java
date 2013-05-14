@@ -71,9 +71,6 @@ public class CMExplorer extends Brain {
 
 		while ((currentMsg = readMessage()) != null) {
 			if (currentMsg.getAct() != null
-					&& currentMsg.getAct() == "TAKEFOOD") {
-			}
-			if (currentMsg.getAct() != null
 					&& currentMsg.getAct() == "basepos") {
 				homeX = currentMsg.getFromX();
 				homeY = currentMsg.getFromY();
@@ -201,21 +198,43 @@ public class CMExplorer extends Brain {
 			Percept currentPercept = percepts[i];
 			
 			// if food and not around a home of same team
-			if (currentPercept.getPerceptType().equals("Food") && (myhome != null && distanceTo(myhome) > FOOD_DIST_TO_HOME))
+			if (currentPercept.getPerceptType().equals("Food"))
 			{
-				println(this.getName()+ " -- doIt -- dist2home : " + distanceTo(myhome));
-				if (!isMyBagFull() ) {
-					int j = takeFood((Food) currentPercept);
-					if (j == 0)
-						setUserMessage((new Integer(this.bagSize())).toString());
-					else if (j == 1)
-						setUserMessage("eating");
-					else
-						setUserMessage("Going to food");
-					broadcast(groupName, "Explorer", "TAKEFOOD",
-							Double.toString(currentPercept.getX()),
-							Double.toString(currentPercept.getY()));
-					return;
+				if (myhome != null)
+				{
+					println(this.getName()+ " -- doIt -- dist2home : " + distanceTo(myhome));
+					if (distanceTo(myhome) > FOOD_DIST_TO_HOME)
+					{
+						if (!isMyBagFull() ) {
+							int j = takeFood((Food) currentPercept);
+							//if (j == 0)
+								setUserMessage((new Integer(this.bagSize())).toString());
+							/*else if (j == 1)
+								setUserMessage("eating");
+							else
+								setUserMessage("Going to food");*/
+							/*broadcast(groupName, "Explorer", "TAKEFOOD",
+									Double.toString(currentPercept.getX()),
+									Double.toString(currentPercept.getY()));*/
+							return;
+						}
+					}
+				}
+				else
+				{
+					if (!isMyBagFull() ) {
+						int j = takeFood((Food) currentPercept);
+						//if (j == 0)
+							setUserMessage((new Integer(this.bagSize())).toString());
+						/*else if (j == 1)
+							setUserMessage("eating");
+						else
+							setUserMessage("Going to food");*/
+						/*broadcast(groupName, "Explorer", "TAKEFOOD",
+								Double.toString(currentPercept.getX()),
+								Double.toString(currentPercept.getY()));*/
+						return;
+					}
 				}
 			}
 		}
