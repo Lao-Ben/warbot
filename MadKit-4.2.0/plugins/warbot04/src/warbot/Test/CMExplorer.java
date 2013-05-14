@@ -3,7 +3,10 @@ package warbot.Test;
 import warbot.kernel.*;
 
 public class CMExplorer extends Brain {
-	
+
+	/**
+	 * if the explorer is less than FOOD_DIST_TO_HOME from a home, it doesn't eat/take food
+	 */
 	final static int FOOD_DIST_TO_HOME = 10;
 	
 	String groupName = "warbot-";
@@ -24,7 +27,7 @@ public class CMExplorer extends Brain {
 	public void activate() {
 		groupName = groupName + getTeam(); // -> warbot-CM
 		randomHeading(); // direction aléatoire
-		println("Explorateur Test opérationnel");
+		println(this.getName()+ " -- activate");
 		createGroup(false, groupName, null, null);
 		requestRole(groupName, roleName, null);
 		requestRole(groupName, "mobile", null);
@@ -55,27 +58,27 @@ public class CMExplorer extends Brain {
 	}
 
 	public void doIt() {
-		String chaineAide = "HELP-E";
-		String chaineAtak = "ATAQ";
-		double positionEnnemiX = 0;
-		double positionEnnemiY = 0;
-		String ennemiX = "";
-		String ennemiY = "";
-		WarbotMessage messCourant = null;
+		String helpStr = "HELP-E";
+		String attackStr = "ATAQ";
+		double ennemyPosX = 0;
+		double ennemyPosY = 0;
+		String ennemyX = "";
+		String ennemyY = "";
+		WarbotMessage currentMsg = null;
 
 		if (!isMoving()) // si bloqué : direction aléatoire
 			randomHeading();
 
-		while ((messCourant = readMessage()) != null) {
+		while ((currentMsg = readMessage()) != null) {
 			// message d'attaque de base ennemie : les coordonnées sont toujours
 			// présentes en argument du message
-			if (messCourant.getAct() != null
-					&& messCourant.getAct() == "TAKEFOOD") {
+			if (currentMsg.getAct() != null
+					&& currentMsg.getAct() == "TAKEFOOD") {
 			}
-			if (messCourant.getAct() != null
-					&& messCourant.getAct() == "basepos") {
-				homeX = messCourant.getFromX();
-				homeY = messCourant.getFromY();
+			if (currentMsg.getAct() != null
+					&& currentMsg.getAct() == "basepos") {
+				homeX = currentMsg.getFromX();
+				homeY = currentMsg.getFromY();
 				broadcast(groupName, "Home", "ExplorerAlive");
 			}
 		}
@@ -128,16 +131,16 @@ public class CMExplorer extends Brain {
 																		// base
 																		// ennemie
 			{
-				ennemiX = Double.toString(currentPercept.getX());
-				ennemiY = Double.toString(currentPercept.getY());
-				broadcast(groupName, "Launcher", chaineAtak, ennemiX, ennemiY);
+				ennemyX = Double.toString(currentPercept.getX());
+				ennemyY = Double.toString(currentPercept.getY());
+				broadcast(groupName, "Launcher", attackStr, ennemyX, ennemyY);
 			}
 		}
 
 		// 2. Si attaqué : demande d'aide sans argument
 		if (getShot()) {
 			println("explorer attaqué");
-			broadcast(groupName, "Launcher", chaineAide, "0", "0");
+			broadcast(groupName, "Launcher", helpStr, "0", "0");
 		}
 
 		// 3. si rocketlauncher ennemi repéré
@@ -151,14 +154,14 @@ public class CMExplorer extends Brain {
 																				// ennemi
 			{
 				// stratégie d'évitement
-				positionEnnemiX = currentPercept.getX(); // abscisse de l'ennemi
-				positionEnnemiY = currentPercept.getY(); // ordonnée de l'ennemi
-				ennemiX = Double.toString(currentPercept.getX());
-				ennemiY = Double.toString(currentPercept.getY());
+				ennemyPosX = currentPercept.getX(); // abscisse de l'ennemi
+				ennemyPosY = currentPercept.getY(); // ordonnée de l'ennemi
+				ennemyX = Double.toString(currentPercept.getX());
+				ennemyY = Double.toString(currentPercept.getY());
 				// println("launcher ennemi repéré");
-				// println(ennemiX);
-				// println(ennemiY);
-				broadcast(groupName, "Launcher", chaineAide, ennemiX, ennemiY);
+				// println(ennemyX);
+				// println(ennemyY);
+				broadcast(groupName, "Launcher", helpStr, ennemyX, ennemyY);
 				for (int j = 0; j < percepts.length; j++) // pour toutes les
 																// entités
 																// perçues...
@@ -176,8 +179,8 @@ public class CMExplorer extends Brain {
 												// l'obstacle
 						{
 							step++;
-							setHeading(towards(-positionEnnemiX / 2,
-									-positionEnnemiY)); // on évite ET l'ennemi,
+							setHeading(towards(-ennemyPosX / 2,
+									-ennemyPosY)); // on évite ET l'ennemi,
 														// Et l'obstacle
 						} else {
 							if (step == maxStep) {
@@ -191,7 +194,7 @@ public class CMExplorer extends Brain {
 						return;
 					}
 				}
-				setHeading(towards(-positionEnnemiX, -positionEnnemiY)); // direction
+				setHeading(towards(-ennemyPosX, -ennemyPosY)); // direction
 																			// opposée
 																			// à
 																			// l'ennemi
