@@ -206,7 +206,7 @@ public class CMExplorer extends Brain {
 			Percept currentPercept = percepts[i];
 			
 			// if food and not around a home of same team
-			if (currentPercept.getPerceptType().equals("Food") && distanceTo(myhome) > FOOD_DIST_TO_HOME)
+			if (currentPercept.getPerceptType().equals("Food") && (myhome != null && distanceTo(myhome) > FOOD_DIST_TO_HOME))
 			{
 				println(this.getName()+ " -- doIt -- dist2home : " + distanceTo(myhome));
 				if (!isMyBagFull() ) {
