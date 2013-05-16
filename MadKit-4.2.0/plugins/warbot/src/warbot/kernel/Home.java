@@ -107,6 +107,7 @@ public class Home extends BasicBody
 	    	        if (pt == null)
 	    	        {
 	    	        	System.err.println(":: "+this+" cannot create " + createWhat + " : no free area to spot!");
+	    	        	r.die();
 	    	        	return;
 	    	        }
 	    	        r.setXY(pt[0], pt[1]);
@@ -154,17 +155,17 @@ public class Home extends BasicBody
     	for (angle = 0; angle < 2*Math.PI; angle += precision) {
         	AffineTransform.getRotateInstance(angle, x, y).transform(pt, 0, pt, 0, 1);
 	    	collision = false;
-//	    	System.err.println("getPointToCreateAgent -- point : " + pt[0] + "," + pt[1]); // debug
+	    	System.err.println("getPointToCreateAgent -- point : " + pt[0] + "," + pt[1]); // debug
         	for (Percept percept : percepts) {
 				if (!(percept instanceof Crossable))
 				{
 					// debug
-			    	//System.err.println("getPointToCreateAgent -- agent " + percept.getPerceptType() + " : " + (x + percept.x) + "," + (y + percept.y) + " ; " + percept.radius);
-			    	//System.err.println("getPointToCreateAgent -- intersect : "
-			    	//				+ (x + percept.x - (percept.getRadius() + margin)) + ","
-			    	//				+ (x - percept.x + (percept.getRadius() + margin)) + ","
-			    	//				+ (y + percept.y - (percept.getRadius() + margin)) + ","
-			    	//				+ (y - percept.y + (percept.getRadius() + margin)));
+			    	System.err.println("getPointToCreateAgent -- agent " + percept.getPerceptType() + " : " + (x + percept.x) + "," + (y + percept.y) + " ; " + percept.radius);
+			    	System.err.println("getPointToCreateAgent -- intersect : "
+			    					+ (x + percept.x - (percept.getRadius() + margin)) + ","
+			    					+ (x - percept.x + (percept.getRadius() + margin)) + ","
+			    					+ (y + percept.y - (percept.getRadius() + margin)) + ","
+			    					+ (y - percept.y + (percept.getRadius() + margin)));
 					if(pt[0] + r.radius >= x + percept.x - (percept.getRadius() + margin)
 					&& pt[0] - r.radius <= x + percept.x + (percept.getRadius() + margin)
 					&& pt[1] + r.radius >= y + percept.y - (percept.getRadius() + margin)
@@ -173,7 +174,10 @@ public class Home extends BasicBody
 				}
 			}
         	if (!collision)
+        	{
+        		System.err.println("getPointToCreateAgent -- returned point : " + pt[0] + "," + pt[1]);
         		return pt;
+        	}
     	}    	
     	return null;
     }
