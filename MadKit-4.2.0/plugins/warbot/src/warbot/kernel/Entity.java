@@ -160,6 +160,8 @@ final public void setShowEnergyLevel(boolean t){showEnergyLevel = t;}
 final public boolean getShowEnergyLevel(){return showEnergyLevel;}
 public void toggleShowEnergyLevel(){showEnergyLevel = !showEnergyLevel;}
 
+final public int getInitialEnergy(){return initialEnergy;}
+
 
 
 public void init(){

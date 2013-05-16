@@ -28,19 +28,19 @@ public class Home extends BasicBody
 	 * Resources are used to create new agents...
 	 */
 	private int resourcelevel=0;
-	final public static int RESOURCEUNIT=400; // with 2 hamburger you may create a new agent..
+	final public static int RESOURCEUNIT=800; // with 2 hamburger you may create a new agent..
 	final protected static int CREATE=6;	//Creation of agent
 	String createWhat=null;
 
     public Home(WarbotEnvironment theWorld, Brain b, String team)
     {
         super(theWorld,b,"command center",team,40,10000,300);
-        setSpeed(5);
+        setSpeed(2);
     }
 
     public Home(){
 	    super();
-        setSpeed(5);
+        setSpeed(2);
 		setDetectingRange(300);
 		this.setEnergy(10000);
 	}
@@ -151,7 +151,7 @@ public class Home extends BasicBody
     	Percept[] percepts = getPercepts();    	
     	double[] pt = {x+minRadius, y};
     	
-    	for (int i = 0; i < 2*Math.PI; angle += precision) {
+    	for (angle = 0; angle < 2*Math.PI; angle += precision) {
         	AffineTransform.getRotateInstance(angle, x, y).transform(pt, 0, pt, 0, 1);
 	    	collision = false;
 //	    	System.err.println("getPointToCreateAgent -- point : " + pt[0] + "," + pt[1]); // debug

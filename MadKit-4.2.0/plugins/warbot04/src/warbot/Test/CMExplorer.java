@@ -36,7 +36,7 @@ public class CMExplorer extends Brain {
 
 	int takeFood(Food p) {
 		if (distanceTo(p) < 2) {
-			if (getEnergyLevel() < getMaximumEnergy() / 2) {
+			if (getEnergyLevel() < getInitialEnergyLevel() / 2) {
 				println(this.getName()+ " -- takeFood -- energy lvl : " + getEnergyLevel() + "/" + getMaximumEnergy());
 				eat((Food) p);
 				return 1;
@@ -237,6 +237,12 @@ public class CMExplorer extends Brain {
 					}
 				}
 			}
+		}
+		
+		if (bagSize() > 0 && getEnergyLevel() < getInitialEnergyLevel() / 2)
+		{
+			drop(bagSize()-1);
+			return;
 		}
 
 		// 6. Move

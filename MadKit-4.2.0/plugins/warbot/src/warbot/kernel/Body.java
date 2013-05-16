@@ -131,6 +131,8 @@ public Percept[] inMyBag();
 /**return the current energy of the robot*/
 public int getEnergy();
 
+public int getInitialEnergy();
+
 public boolean getShot();
 
 public boolean moving();
