@@ -151,7 +151,7 @@ public class Home extends BasicBody
     	Percept[] percepts = getPercepts();    	
     	double[] pt = {x+minRadius, y};
     	
-    	for (int i = 0; i < 2*Math.PI; angle += precision) {
+    	for (angle = 0; angle < 2*Math.PI; angle += precision) {
         	AffineTransform.getRotateInstance(angle, x, y).transform(pt, 0, pt, 0, 1);
 	    	collision = false;
 //	    	System.err.println("getPointToCreateAgent -- point : " + pt[0] + "," + pt[1]); // debug
