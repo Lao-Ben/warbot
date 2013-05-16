@@ -28,19 +28,19 @@ public class Home extends BasicBody
 	 * Resources are used to create new agents...
 	 */
 	private int resourcelevel=0;
-	final public static int RESOURCEUNIT=400; // with 2 hamburger you may create a new agent..
+	final public static int RESOURCEUNIT=800; // with 2 hamburger you may create a new agent..
 	final protected static int CREATE=6;	//Creation of agent
 	String createWhat=null;
 
     public Home(WarbotEnvironment theWorld, Brain b, String team)
     {
         super(theWorld,b,"command center",team,40,10000,300);
-        setSpeed(5);
+        setSpeed(2);
     }
 
     public Home(){
 	    super();
-        setSpeed(5);
+        setSpeed(2);
 		setDetectingRange(300);
 		this.setEnergy(10000);
 	}

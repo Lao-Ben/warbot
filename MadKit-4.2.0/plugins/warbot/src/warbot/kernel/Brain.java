@@ -190,6 +190,14 @@ public String getTeam()
   {
   	return  myBody.getEnergy();
   }
+  
+  /**
+ * @eturn the initial energy level of the robot
+ */
+  public int getInitialEnergyLevel()
+  {
+  	return  myBody.getInitialEnergy();
+  }
 
   /* Use this action supposed you have choosed to play the role of "laser robot"
   protected int getLaserRange()

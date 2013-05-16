@@ -108,11 +108,11 @@ public class CMHome extends Brain
 //			println("HELP ! nb ennemis : "+nbEnnemisProches);
 			broadcast(groupName,"Launcher",actMessageAideL,argLauncherX,argLauncherY);
 
-			if (getResourceLevel() >= 400)
+			if (getResourceLevel() >= 800)
 				createAgent("TestRocketLauncher");
 			return;
 		}
-		if (getResourceLevel() >= 400)
+		if (getResourceLevel() >= 800)
 		{
 			if (nbLauncher > nbExplorer)
 				createAgent("TestExplorer");

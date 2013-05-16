@@ -32,14 +32,14 @@ public class RocketLauncher extends BasicBody
 public RocketLauncher(WarbotEnvironment env,Brain b,String team)
 {
 	super(env,b,"rocket launcher",team,15,8000,45);
-	setSpeed(5);
+	setSpeed(3);
 }
 
 public RocketLauncher()
 {
     super();
 	setDetectingRange(45);
-	setSpeed(5);
+	setSpeed(3);
 	maximumEnergy=8000;
 }
 
