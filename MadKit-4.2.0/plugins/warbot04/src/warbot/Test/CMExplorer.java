@@ -36,7 +36,7 @@ public class CMExplorer extends Brain {
 
 	int takeFood(Food p) {
 		if (distanceTo(p) < 2) {
-			if (getEnergyLevel() < getMaximumEnergy() / 2) {
+			if (Math.random() < .1/*getEnergyLevel() < getMaximumEnergy() / 2*/) {
 				println(this.getName()+ " -- takeFood -- energy lvl : " + getEnergyLevel() + "/" + getMaximumEnergy());
 				eat((Food) p);
 				return 1;
