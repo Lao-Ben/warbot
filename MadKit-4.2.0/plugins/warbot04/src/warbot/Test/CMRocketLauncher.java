@@ -10,12 +10,16 @@ public class CMRocketLauncher extends Brain
 	int tempsMax		= 10;
 	int temps			= tempsMax;	// variable permettant de garder la meme direction pendant tempsMax itérations
 
+	Percept myhome = null;
+	double homeX = 0;
+	double homeY = 0;
+	
 	public CMRocketLauncher(){}
 
 	public void activate()
 	{
-		groupName=groupName+getTeam();  // -> warbot-CM
-		randomHeading();  				// direction aléatoire
+		groupName=groupName+getTeam();
+		randomHeading();
 		println("RocketLauncher Test opérationnel");
 		createGroup(false,groupName,null,null);
 		requestRole(groupName,roleName,null);
@@ -108,66 +112,69 @@ public class CMRocketLauncher extends Brain
 		String actMessageAttaque	= "ATAQ";			// cas de détection de la base ennemie
 		String argMessageX 			= "";				// pour envoyer position relative en X de l'ennemi
 		String argMessageY 			= "";				// pour envoyer position relative en Y de l'ennemi
-		WarbotMessage messCourant	= null;
+		WarbotMessage currentMsg	= null;
 		// variables diverses
 		double directionX			= 0;
 		double directionY			= 0;
 		int seuilEnergieBase		= 6000;				// énergie seuil pour "se défendre" vs "se sacrifier"
 		
 		// récupération et classement des messages
-		while((messCourant = readMessage())!= null)
+		while((currentMsg = readMessage())!= null)
 		{
 			// message d'attaque de base ennemie : les coordonnées sont toujours présentes en argument du message
-			if(messCourant.getAct() != null && messCourant.getAct() == "ATAQ")
+			if(currentMsg.getAct() != null && currentMsg.getAct() == "ATAQ")
 			{
-				tabAtaq[0][comptAtaq] = Double.valueOf(messCourant.getArg1()).doubleValue();
-				tabAtaq[1][comptAtaq] = Double.valueOf(messCourant.getArg2()).doubleValue();
-				tabAtaq[2][comptAtaq] = messCourant.getFromX();
-				tabAtaq[3][comptAtaq] = messCourant.getFromY();
+				tabAtaq[0][comptAtaq] = Double.valueOf(currentMsg.getArg1()).doubleValue();
+				tabAtaq[1][comptAtaq] = Double.valueOf(currentMsg.getArg2()).doubleValue();
+				tabAtaq[2][comptAtaq] = currentMsg.getFromX();
+				tabAtaq[3][comptAtaq] = currentMsg.getFromY();
 				comptAtaq++;
 			}
 			// message d'aide d'une base concernant les launchers : les coordonnées de l'ennemi sont toujours présentes en argument du message
-			if(messCourant.getAct() != null && messCourant.getAct() == "HELP-BL")
+			if(currentMsg.getAct() != null && currentMsg.getAct() == "HELP-BL")
 			{
-				tabHelpBL[0][comptHelpBL] = Double.valueOf(messCourant.getArg1()).doubleValue();
-				tabHelpBL[1][comptHelpBL] = Double.valueOf(messCourant.getArg2()).doubleValue();	
-				tabHelpBL[2][comptHelpBL] = messCourant.getFromX();
-				tabHelpBL[3][comptHelpBL] = messCourant.getFromY();
+				tabHelpBL[0][comptHelpBL] = Double.valueOf(currentMsg.getArg1()).doubleValue();
+				tabHelpBL[1][comptHelpBL] = Double.valueOf(currentMsg.getArg2()).doubleValue();	
+				tabHelpBL[2][comptHelpBL] = currentMsg.getFromX();
+				tabHelpBL[3][comptHelpBL] = currentMsg.getFromY();
 				comptHelpBL++;
 			}
 			// message d'aide d'une base concernant les explorers: les coordonnées de l'ennemi sont toujours présentes en argument du message
-			if(messCourant.getAct() != null && messCourant.getAct() == "HELP-BE")
+			if(currentMsg.getAct() != null && currentMsg.getAct() == "HELP-BE")
 			{
-				tabHelpBE[0][comptHelpBE] = Double.valueOf(messCourant.getArg1()).doubleValue();
-				tabHelpBE[1][comptHelpBE] = Double.valueOf(messCourant.getArg2()).doubleValue();	
-				tabHelpBE[2][comptHelpBE] = messCourant.getFromX();
-				tabHelpBE[3][comptHelpBE] = messCourant.getFromY();
+				tabHelpBE[0][comptHelpBE] = Double.valueOf(currentMsg.getArg1()).doubleValue();
+				tabHelpBE[1][comptHelpBE] = Double.valueOf(currentMsg.getArg2()).doubleValue();	
+				tabHelpBE[2][comptHelpBE] = currentMsg.getFromX();
+				tabHelpBE[3][comptHelpBE] = currentMsg.getFromY();
 				comptHelpBE++;
 			}
 			// message d'aide d'un launcher : les coordonnées de l'ennemi sont toujours présentes en argument du message
-			if(messCourant.getAct() != null && messCourant.getAct() == "HELP-L")
+			if(currentMsg.getAct() != null && currentMsg.getAct() == "HELP-L")
 			{
 				// un launcher ne prend pas en compte ses propres messages
-				if(messCourant.getFromX() != 0 && messCourant.getFromY() != 0)
+				if(currentMsg.getFromX() != 0 && currentMsg.getFromY() != 0)
 				{
-					tabHelpL[0][comptHelpL] = Double.valueOf(messCourant.getArg1()).doubleValue();
-					tabHelpL[1][comptHelpL] = Double.valueOf(messCourant.getArg2()).doubleValue();	
-					tabHelpL[2][comptHelpL] = messCourant.getFromX();
-					tabHelpL[3][comptHelpL] = messCourant.getFromY();
+					tabHelpL[0][comptHelpL] = Double.valueOf(currentMsg.getArg1()).doubleValue();
+					tabHelpL[1][comptHelpL] = Double.valueOf(currentMsg.getArg2()).doubleValue();	
+					tabHelpL[2][comptHelpL] = currentMsg.getFromX();
+					tabHelpL[3][comptHelpL] = currentMsg.getFromY();
 					comptHelpL++;
 				}
 			}
 			// message d'aide d'un explorer : pas de coordonnées de l'ennemi en argument si message suite à tir
-			if(messCourant.getAct() != null && messCourant.getAct() == "HELP-E")
+			if(currentMsg.getAct() != null && currentMsg.getAct() == "HELP-E")
 			{
-				tabHelpE[0][comptHelpE] = Double.valueOf(messCourant.getArg1()).doubleValue();
-				tabHelpE[1][comptHelpE] = Double.valueOf(messCourant.getArg2()).doubleValue();	
-				tabHelpE[2][comptHelpE] = messCourant.getFromX();
-				tabHelpE[3][comptHelpE] = messCourant.getFromY();
+				tabHelpE[0][comptHelpE] = Double.valueOf(currentMsg.getArg1()).doubleValue();
+				tabHelpE[1][comptHelpE] = Double.valueOf(currentMsg.getArg2()).doubleValue();	
+				tabHelpE[2][comptHelpE] = currentMsg.getFromX();
+				tabHelpE[3][comptHelpE] = currentMsg.getFromY();
 				comptHelpE++;
 			}
-			if (messCourant.getAct() != null
-					&& messCourant.getAct() == "basepos") {
+			if (currentMsg.getAct() != null
+					&& currentMsg.getAct() == "basepos") {
+				homeX = currentMsg.getFromX();
+				homeY = currentMsg.getFromY();
+				setUserMessage(homeX + " ; " + homeY);
 				broadcast(groupName, "Home", "LauncherAlive");
 			}
 		}
@@ -184,10 +191,45 @@ public class CMRocketLauncher extends Brain
 		// fin récupération et classement des messages
 		
 		// récupération et classement des objets perçus
-		Percept[] objetsPercus = getPercepts();  		// entités dans le périmètre de perception
-		for(int i=0;i<objetsPercus.length;i++)  // pour toutes les entités perçues...
+		Percept[] percepts = getPercepts();  		// entities in the perception radius
+		
+		for (int i = 0; i < percepts.length; i++)
 		{
-			Percept objetCourant = objetsPercus[i];
+			Percept currentPercept = percepts[i];
+			if (myhome == currentPercept)
+				break;
+			if (currentPercept.getTeam().equals(getTeam())
+					&& currentPercept.getPerceptType().equals("Home"))
+			{
+				myhome = currentPercept;
+				break;
+			}
+		}
+		
+		if (getRocketNumber() == 0) {
+			if (myhome != null)
+			{
+				if (distanceTo(myhome) < 2)
+				{
+					reloadRocket();
+				}
+				else
+				{
+					setHeading(towards(myhome.getX(), myhome.getY()));
+					move();
+				}
+			}
+			else
+			{
+				setHeading(towards(homeX, homeY));
+				move();
+			}
+			return;
+		}
+		
+		for(int i=0;i<percepts.length;i++)  // pour toutes les entités perçues...
+		{
+			Percept objetCourant = percepts[i];
 			if(objetCourant.getTeam().equals(getTeam()))	// objet de mon équipe
 			{
 				tabMyTeam[0][comptMyTeam] = objetCourant.getX();
@@ -354,9 +396,9 @@ public class CMRocketLauncher extends Brain
 		}
 			
 		// Y : rejoindre ami perçu
-		for(int i=0;i<objetsPercus.length;i++)  // pour toutes les entités perçues...
+		for(int i=0;i<percepts.length;i++)  // pour toutes les entités perçues...
 		{
-			Percept objetCourant = objetsPercus[i];
+			Percept objetCourant = percepts[i];
 			if (objetCourant.getTeam().equals(getTeam()) && objetCourant.getPerceptType().equals("RocketLauncher") && distanceTo(objetCourant) > distanceAmis && distanceTo(objetCourant) < distanceMinAmis)
 			{
 				if (!isMoving())	// cas où il a blocage : changement de direction
@@ -375,8 +417,11 @@ public class CMRocketLauncher extends Brain
 		if (!isMoving())
 		{
 			randomHeading();
-		}	
-		move();
+		}
+		if (getRocketNumber() < 10)
+			buildRocket();
+		else
+			move();
 		return;	
 	}
 }

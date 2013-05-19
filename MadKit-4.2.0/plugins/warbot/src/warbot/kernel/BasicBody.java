@@ -485,6 +485,10 @@ public int getRocketNb(){
     return 0;
 }
 
+public void reloadRocket(){
+    System.out.println(":: reloadRocket" + " not accessible from " + this);
+}
+
 public void createAgent(String type){
     System.out.println(":: createAgent" + " not accessible from " + this);
 }

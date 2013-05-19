@@ -338,6 +338,12 @@ public int getRocketNumber()
 	return myBody.getRocketNb();
 }
 
+/** reload the rocket that the robot currently hold*/
+public void reloadRocket()
+{
+	myBody.reloadRocket();
+}
+
 /**set the robot direction, direction*/
 public void setHeading(double direction)
 {
