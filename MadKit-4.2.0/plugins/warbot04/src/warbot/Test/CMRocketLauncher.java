@@ -117,6 +117,7 @@ public class CMRocketLauncher extends Brain
 		double directionX			= 0;
 		double directionY			= 0;
 		int seuilEnergieBase		= 6000;				// énergie seuil pour "se défendre" vs "se sacrifier"
+		boolean baseAlive			= false;
 		
 		// récupération et classement des messages
 		while((currentMsg = readMessage())!= null)
@@ -172,9 +173,10 @@ public class CMRocketLauncher extends Brain
 			}
 			if (currentMsg.getAct() != null
 					&& currentMsg.getAct() == "basepos") {
+				baseAlive = true;
 				homeX = currentMsg.getFromX();
 				homeY = currentMsg.getFromY();
-				setUserMessage(homeX + " ; " + homeY);
+				setUserMessage(homeX + " ; "+ homeY);
 				broadcast(groupName, "Home", "LauncherAlive");
 			}
 		}
@@ -206,25 +208,22 @@ public class CMRocketLauncher extends Brain
 			}
 		}
 		
-		if (getRocketNumber() == 0) {
-			if (myhome != null)
+		if (baseAlive && getRocketNumber() == 0) {
+			if (myhome != null && distanceTo(myhome) < 2)
 			{
-				if (distanceTo(myhome) < 2)
-				{
-					reloadRocket();
-				}
-				else
-				{
-					setHeading(towards(myhome.getX(), myhome.getY()));
-					move();
-				}
+				reloadRocket();
+				setHeading(towards(-myhome.getX(), -myhome.getY()));
+				return;
 			}
 			else
 			{
-				setHeading(towards(homeX, homeY));
+				if (!isMoving())
+					randomHeading();
+				else
+					setHeading(towards(homeX, homeY));
 				move();
+				return;
 			}
-			return;
 		}
 		
 		for(int i=0;i<percepts.length;i++)  // pour toutes les entités perçues...
@@ -414,14 +413,14 @@ public class CMRocketLauncher extends Brain
 			}
 		}
 		// Z : déplacement aléatoire
-		if (!isMoving())
-		{
-			randomHeading();
-		}
 		if (getRocketNumber() < 10)
 			buildRocket();
 		else
+		{
+			if (!isMoving())
+				randomHeading();
 			move();
+		}
 		return;	
 	}
 }
