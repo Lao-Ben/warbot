@@ -1,5 +1,7 @@
 package warbot.Test;
 
+import java.util.Random;
+
 import warbot.kernel.*;
 
 public class CMExplorer extends Brain {
@@ -22,6 +24,7 @@ public class CMExplorer extends Brain {
 	Percept myhome = null;
 	double homeX = 0;
 	double homeY = 0;
+	int role = 0;
 
 	public CMExplorer() {
 	}
@@ -34,6 +37,7 @@ public class CMExplorer extends Brain {
 		requestRole(groupName, roleName, null);
 		requestRole(groupName, "mobile", null);
 		this.setUserMessage((new Integer(this.bagSize())).toString());
+		role = Math.abs((new Random().nextInt()) % 2) + 1;
 	}
 
 	int takeFood(Food p) {
@@ -200,7 +204,7 @@ public class CMExplorer extends Brain {
 		}
 
 		// 4. Food percepted
-		if (!enn) 
+		if (!enn && role == 1) 
 		{
 			for (int i = 0; i < percepts.length; i++) // pour toutes les entités
 			// perçues...
