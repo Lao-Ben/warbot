@@ -99,7 +99,7 @@ public class Home extends BasicBody
     	if (createWhat != null){
     		try {
     			if (getResourceLevel()>= RESOURCEUNIT){
-	    	        getStructure().getAgent().doCommand(new SEdit.NewNodeCommand(createWhat,new Point(0,0)));
+	    	        getStructure().getAgent().doCommand(new SEdit.NewNodeCommand(createWhat,new Point(-100,-100)));
 	    	        BasicBody r = (BasicBody)((WarbotStructure)getStructure()).getLastEntity();
 	    	        r.setHeading(Math.random()*360);
 	    	       // r.setXY( (radius+r.getRadius()+1)*r.getCosAlpha()+x,(radius+r.getRadius()+1)*r.getSinAlpha()+y);

@@ -202,7 +202,7 @@ public class CMExplorer extends Brain {
 			{
 				if (myhome != null)
 				{
-					println(this.getName()+ " -- doIt -- dist2home : " + distanceTo(myhome));
+					//println(this.getName()+ " -- doIt -- dist2home : " + distanceTo(myhome));
 					if (distanceTo(myhome) > FOOD_DIST_TO_HOME)
 					{
 						if (!isMyBagFull() ) {

@@ -114,7 +114,7 @@ public class CMHome extends Brain
 		}
 		if (getResourceLevel() >= 800)
 		{
-			if (nbLauncher > nbExplorer)
+			if (nbLauncher > nbExplorer && nbExplorer < 10)
 				createAgent("TestExplorer");
 			else
 				createAgent("TestRocketLauncher");
