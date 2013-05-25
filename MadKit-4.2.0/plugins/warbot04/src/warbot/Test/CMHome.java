@@ -17,7 +17,7 @@ public class CMHome extends Brain
 
 	public void activate()
 	{
-		groupName=groupName+getTeam();  // -> warbot-CM
+		groupName=groupName+getTeam();
 		println("Base Test opérationnelle");		
 		createGroup(false,groupName,null,null);
 		requestRole(groupName,roleName,null);

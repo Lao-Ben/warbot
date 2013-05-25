@@ -23,8 +23,8 @@ import java.awt.Point;
 
 public class RocketLauncher extends BasicBody
 {
-	final static protected int maximumRocket = 50;
-	protected int rocketNb=300;
+	final static protected int maximumRocket = 30;
+	protected int rocketNb=30;
 	final protected static int SHOOT=10; //ACTION DESCRIPTION
 	final protected static int BUILD_ROCKET=11; //ACTION DESCRIPTION
 	private double rocketDirection=0;
@@ -33,6 +33,7 @@ public RocketLauncher(WarbotEnvironment env,Brain b,String team)
 {
 	super(env,b,"rocket launcher",team,15,8000,45);
 	setSpeed(3);
+	rocketNb = maximumRocket;
 }
 
 public RocketLauncher()
@@ -41,6 +42,7 @@ public RocketLauncher()
 	setDetectingRange(45);
 	setSpeed(3);
 	maximumEnergy=8000;
+	rocketNb = maximumRocket;
 }
 
 public Percept makePercept(double dx, double dy, double d){
@@ -62,6 +64,8 @@ public void buildRocket()
 }
 
 public int getRocketNb(){ return rocketNb;}
+
+public void reloadRocket(){ rocketNb = maximumRocket; }
 
 int rocketWaitMax=3;
 int rocketWait=rocketWaitMax;

@@ -1,43 +1,50 @@
 package warbot.Test;
 
+import java.util.Random;
+
 import warbot.kernel.*;
 
 public class CMExplorer extends Brain {
 
 	/**
-	 * if the explorer is less than FOOD_DIST_TO_HOME from a home, it doesn't eat/take food
+	 * if the explorer is less than FOOD_DIST_TO_HOME from a home, it doesn't
+	 * eat/take food
 	 */
 	final static int FOOD_DIST_TO_HOME = 10;
-	
+
 	String groupName = "warbot-";
 	final static String roleName = "Explorer";
 	final static int maxStep = 8;
-		
+
 	/**
 	 * step : used to keep direction during maxStep steps
 	 */
 	int step = 0;
-	
+
 	Percept myhome = null;
 	double homeX = 0;
 	double homeY = 0;
+	int role = 0;
 
-	public CMExplorer() {}
+	public CMExplorer() {
+	}
 
 	public void activate() {
-		groupName = groupName + getTeam(); // -> warbot-CM
+		groupName = groupName + getTeam();
 		randomHeading();
-		println(this.getName()+ " -- activate");
+		println(this.getName() + " -- activate");
 		createGroup(false, groupName, null, null);
 		requestRole(groupName, roleName, null);
 		requestRole(groupName, "mobile", null);
 		this.setUserMessage((new Integer(this.bagSize())).toString());
+		//role = Math.abs((new Random().nextInt()) % 2) + 1;
 	}
 
 	int takeFood(Food p) {
 		if (distanceTo(p) < 2) {
-			if (Math.random() < .1/*getEnergyLevel() < getMaximumEnergy() / 2*/) {
-				println(this.getName()+ " -- takeFood -- energy lvl : " + getEnergyLevel() + "/" + getMaximumEnergy());
+			if (getEnergyLevel() < getInitialEnergyLevel() / 2) {
+				println(this.getName() + " -- takeFood -- energy lvl : "
+						+ getEnergyLevel() + "/" + getMaximumEnergy());
 				eat((Food) p);
 				return 1;
 			} else {
@@ -58,48 +65,48 @@ public class CMExplorer extends Brain {
 	}
 
 	public void doIt() {
-		String helpStr = "HELP-E";
-		String attackStr = "ATAQ";
-		double ennemyPosX = 0;
-		double ennemyPosY = 0;
-		String ennemyX = "";
-		String ennemyY = "";
-		WarbotMessage currentMsg = null;
+		String helpStr 				= "HELP-E";
+		String attackStr 			= "ATAQ";
+		double ennemyPosX 			= 0;
+		double ennemyPosY 			= 0;
+		String ennemyX 				= "";
+		String ennemyY 				= "";
+		boolean enn 				= false;
+		WarbotMessage currentMsg 	= null;
+		boolean baseAlive			= false;
 
 		if (!isMoving()) // if got stuck
 			randomHeading();
 
 		while ((currentMsg = readMessage()) != null) {
-			if (currentMsg.getAct() != null
-					&& currentMsg.getAct() == "basepos") {
+			if (currentMsg.getAct() != null && currentMsg.getAct() == "basepos") {
 				homeX = currentMsg.getFromX();
 				homeY = currentMsg.getFromY();
 				broadcast(groupName, "Home", "ExplorerAlive");
+				baseAlive = true;
 			}
 		}
 
 		Percept[] percepts = getPercepts(); // entities in the perception radius
-		
-		for (int i = 0; i < percepts.length; i++)
-		{
+
+		for (int i = 0; i < percepts.length; i++) {
 			Percept currentPercept = percepts[i];
 			if (myhome == currentPercept)
 				break;
 			if (currentPercept.getTeam().equals(getTeam())
-					&& currentPercept.getPerceptType().equals("Home"))
-			{
+					&& currentPercept.getPerceptType().equals("Home")) {
 				myhome = currentPercept;
 				break;
 			}
 		}
 
-		if (myhome != null && distanceTo(myhome) < 2 && bagSize() > 0) {
+		if (baseAlive && myhome != null && distanceTo(myhome) < 2 && bagSize() > 0) {
 			setUserMessage("drop all");
 			dropAll();
 			setUserMessage((new Integer(this.bagSize())).toString());
 			return;
-		} else if (isBagFull()) {
-			if(!isMoving())
+		} else if (baseAlive && isBagFull()) {
+			if (!isMoving())
 				randomHeading();
 			else
 				setHeading(towards(homeX, homeY));
@@ -110,11 +117,12 @@ public class CMExplorer extends Brain {
 
 		// 1. Ennemy's base found => broadcast
 		for (int i = 0; i < percepts.length; i++) // pour toutes les entités
-														// perçues...
+													// perçues...
 		{
 			Percept currentPercept = percepts[i];
 			if (!currentPercept.getTeam().equals(getTeam())
-					&& currentPercept.getPerceptType().equals("Home")) // si objet
+					&& currentPercept.getPerceptType().equals("Home")) // si
+																		// objet
 																		// courant
 																		// =
 																		// base
@@ -134,15 +142,16 @@ public class CMExplorer extends Brain {
 
 		// 3. Ennemy rocketlauncher spotted => go away & broadcast
 		for (int i = 0; i < percepts.length; i++) // pour toutes les entités
-														// perçues...
+													// perçues...
 		{
 			Percept currentPercept = percepts[i];
 			if (!currentPercept.getTeam().equals(getTeam())
 					&& currentPercept.getPerceptType().equals("RocketLauncher")) // si
-																				// RocketLauncher
-																				// ennemi
+																					// RocketLauncher
+																					// ennemi
 			{
 				// stratégie d'évitement
+				enn = true;
 				ennemyPosX = currentPercept.getX(); // abscisse de l'ennemi
 				ennemyPosY = currentPercept.getY(); // ordonnée de l'ennemi
 				ennemyX = Double.toString(currentPercept.getX());
@@ -152,8 +161,8 @@ public class CMExplorer extends Brain {
 				// println(ennemyY);
 				broadcast(groupName, "Launcher", helpStr, ennemyX, ennemyY);
 				for (int j = 0; j < percepts.length; j++) // pour toutes les
-																// entités
-																// perçues...
+															// entités
+															// perçues...
 				{
 					Percept currentPercept2 = percepts[j];
 					if ((getHeading()
@@ -165,16 +174,19 @@ public class CMExplorer extends Brain {
 					// champ de la direction de l'agent
 					{
 						if (step == 0) // si on vient de repérer
-												// l'obstacle
+										// l'obstacle
 						{
 							step++;
-							setHeading(towards(-ennemyPosX / 2,
-									-ennemyPosY)); // on évite ET l'ennemi,
-														// Et l'obstacle
+							setHeading(towards(-ennemyPosX / 2, -ennemyPosY)); // on
+																				// évite
+																				// ET
+																				// l'ennemi,
+																				// Et
+																				// l'obstacle
 						} else {
 							if (step == maxStep) {
 								step = 0;
-							} else // 0 < "current step" < maxStep 
+							} else // 0 < "current step" < maxStep
 							{
 								step++;
 							}
@@ -184,59 +196,69 @@ public class CMExplorer extends Brain {
 					}
 				}
 				setHeading(towards(-ennemyPosX, -ennemyPosY)); // direction
-																			// opposée
-																			// à
-																			// l'ennemi
-																			// repéré
+																// opposée
+																// à
+																// l'ennemi
+																// repéré
 			}
 		}
 
 		// 4. Food percepted
-		for (int i = 0; i < percepts.length; i++) // pour toutes les entités
-														// perçues...
+		if (!enn && role == 1) 
 		{
-			Percept currentPercept = percepts[i];
-			
-			// if food and not around a home of same team
-			if (currentPercept.getPerceptType().equals("Food"))
+			for (int i = 0; i < percepts.length; i++) // pour toutes les entités
+			// perçues...
 			{
-				if (myhome != null)
-				{
-					//println(this.getName()+ " -- doIt -- dist2home : " + distanceTo(myhome));
-					if (distanceTo(myhome) > FOOD_DIST_TO_HOME)
-					{
-						if (!isMyBagFull() ) {
+				Percept currentPercept = percepts[i];
+
+				// if food and not around a home of same team
+				if (currentPercept.getPerceptType().equals("Food")) {
+					if (myhome != null) {
+						println(this.getName() + " -- doIt -- dist2home : "
+								+ distanceTo(myhome));
+						if (distanceTo(myhome) > FOOD_DIST_TO_HOME) {
+							if (!isMyBagFull()) {
+								int j = takeFood((Food) currentPercept);
+								// if (j == 0)
+								setUserMessage((new Integer(this.bagSize()))
+										.toString());
+								/*
+								 * else if (j == 1) setUserMessage("eating");
+								 * else setUserMessage("Going to food");
+								 */
+								/*
+								 * broadcast(groupName, "Explorer", "TAKEFOOD",
+								 * Double.toString(currentPercept.getX()),
+								 * Double.toString(currentPercept.getY()));
+								 */
+								return;
+							}
+						}
+					} else {
+						if (!isMyBagFull()) {
 							int j = takeFood((Food) currentPercept);
-							//if (j == 0)
-								setUserMessage((new Integer(this.bagSize())).toString());
-							/*else if (j == 1)
-								setUserMessage("eating");
-							else
-								setUserMessage("Going to food");*/
-							/*broadcast(groupName, "Explorer", "TAKEFOOD",
-									Double.toString(currentPercept.getX()),
-									Double.toString(currentPercept.getY()));*/
+							// if (j == 0)
+							setUserMessage((new Integer(this.bagSize()))
+									.toString());
+							/*
+							 * else if (j == 1) setUserMessage("eating"); else
+							 * setUserMessage("Going to food");
+							 */
+							/*
+							 * broadcast(groupName, "Explorer", "TAKEFOOD",
+							 * Double.toString(currentPercept.getX()),
+							 * Double.toString(currentPercept.getY()));
+							 */
 							return;
 						}
 					}
 				}
-				else
-				{
-					if (!isMyBagFull() ) {
-						int j = takeFood((Food) currentPercept);
-						//if (j == 0)
-							setUserMessage((new Integer(this.bagSize())).toString());
-						/*else if (j == 1)
-							setUserMessage("eating");
-						else
-							setUserMessage("Going to food");*/
-						/*broadcast(groupName, "Explorer", "TAKEFOOD",
-								Double.toString(currentPercept.getX()),
-								Double.toString(currentPercept.getY()));*/
-						return;
-					}
-				}
 			}
+		}
+
+		if (!enn && bagSize() > 0 && getEnergyLevel() < getInitialEnergyLevel() / 2) {
+			drop(bagSize() - 1);
+			return;
 		}
 
 		// 6. Move

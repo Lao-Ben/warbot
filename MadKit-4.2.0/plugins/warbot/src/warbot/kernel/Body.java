@@ -161,6 +161,8 @@ public void buildRocket();
 
 public int getRocketNb();
 
+public void reloadRocket();
+
 /*public int getLaserRange();
 
 /** Use this action supposed you have choosed to play the role of "light robot"
