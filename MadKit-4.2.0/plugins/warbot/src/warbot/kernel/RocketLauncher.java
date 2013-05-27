@@ -80,6 +80,7 @@ void tryShoot()
 
         getStructure().getAgent().doCommand(new SEdit.NewNodeCommand("Rocket",new Point(0,0)));
         Rocket r = (Rocket)((WarbotStructure)getStructure()).getLastEntity();
+        r.setTeam(team);
         r.setHeading(rocketDirection);
         r.setXY( (radius+r.getRadius()+1)*r.getCosAlpha()+x,(radius+r.getRadius()+1)*r.getSinAlpha()+y);
 

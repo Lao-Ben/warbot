@@ -46,7 +46,6 @@ public class CMHome extends Brain
 		
 		while((messCourant = readMessage())!= null)
 		{
-			// message d'attaque de base ennemie : les coordonnées sont toujours présentes en argument du message
 			if(messCourant.getAct() != null && messCourant.getAct() == "ExplorerAlive")
 			{
 				nbExplorer++;

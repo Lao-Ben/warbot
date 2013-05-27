@@ -144,9 +144,8 @@
       <icon url="images/world/dynamite.gif"/>
       <property name="radius">1</property>
 	  <property name="energy">100</property>
-      <graphic-element class="SEdit.Graphics.GOval">
-		<property name="width">2</property>
-		<property name="height">2</property>
+      <graphic-element class="warbot.kernel.GEntity">
+		<property name="imageaddress">images/world/rocket.gif</property>
 		<property name="displaylabel">false</property>
       </graphic-element>
     </node-desc>
@@ -440,7 +439,7 @@
 	  <property name="team">BPV</property>
       <property name="detectingrange">130</property>
 	  <property name="energy">1000</property>
-	  <property name="brainClass">warbot.BPV_team.BPVExplorer</property>
+	  <property name="brainClass">warbot.BPV_Team.BPVExplorer</property>
       <graphic-element class="warbot.kernel.GBasicBody">
 		<property name="imageaddress">images/warbot/BPV_images/rantanplan.gif</property>
 		<property name="labelLocation">4</property>
@@ -453,7 +452,7 @@
       <property name="radius">20</property>
       <property name="detectingrange">200</property>
 	  <property name="energy">12000</property>
-	  <property name="brainClass">warbot.BPV_team.BPVHome</property>
+	  <property name="brainClass">warbot.BPV_Team.BPVHome</property>
       <graphic-element class="warbot.kernel.GBasicBody">
 		<property name="imageaddress">images/warbot/BPV_images/saloon.gif</property>
 		<property name="displaylabel">false</property>
