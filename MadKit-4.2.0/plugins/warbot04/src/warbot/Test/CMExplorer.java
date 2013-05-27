@@ -37,7 +37,7 @@ public class CMExplorer extends Brain {
 		requestRole(groupName, roleName, null);
 		requestRole(groupName, "mobile", null);
 		this.setUserMessage((new Integer(this.bagSize())).toString());
-		//role = Math.abs((new Random().nextInt()) % 2) + 1;
+		role = Math.abs((new Random().nextInt()) % 2) + 1;
 	}
 
 	int takeFood(Food p) {
