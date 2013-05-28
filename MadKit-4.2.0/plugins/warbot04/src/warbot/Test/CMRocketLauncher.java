@@ -8,16 +8,16 @@ public class CMRocketLauncher extends Brain {
 	String groupName = "warbot-";
 	String roleName = "Launcher";
 
-	int tempsMax = 10;
+	final int tempsMax = 10;
 	int temps = tempsMax; // variable permettant de garder la meme direction
 							// pendant tempsMax itérations
 
 	Percept myhome = null;
 	double homeX = 0;
 	double homeY = 0;
-	double timeescp = 0;
-	double timeescpmax = 4;
-	boolean esc = false;
+	
+	final int maxStep = 8;
+	int step = 0;
 	
 
 	public CMRocketLauncher() {
@@ -274,18 +274,6 @@ public class CMRocketLauncher extends Brain {
 		comptHelpE = 0;
 		comptHelpL = 0;
 		// fin récupération et classement des messages
-
-		if (esc)
-		{
-			if (timeescp > 0)
-			{
-				timeescp--;
-				move();
-				return;
-			}
-			else
-				esc = false;
-		}
 		
 		// récupération et classement des objets perçus
 		Percept[] percepts = getPercepts(); // entities in the perception radius
@@ -414,21 +402,29 @@ public class CMRocketLauncher extends Brain {
 		// et des messages reçus
 		if (tabRocket[2] != 0) {
 			setUserMessage("detect rocket");
-			/*for (int j = 0; j < percepts.length; j++)
+			for (int j = 0; j < percepts.length; j++)
 			{
 				Percept currentPercept2 = percepts[j];
 				if ((getHeading()
 						- (towards(currentPercept2.getX(),
 								tabRocket[1])) >= 20)
 						&& (currentPercept2.getPerceptType().equals("Obstacle")))
-				// si détecte un obstacle et que cet obstacle est dans le
-				// champ de la direction de l'agent
 				{
-					setHeading(towards(-currentPercept2.getX(), -currentPercept2.getY()));
+					if (step == 0)
+					{
+						step++;
+						setHeading(towards(-tabRocket[0]/2, -tabRocket[1]));
+					} 
+					else {
+						if (step == maxStep)
+							step = 0;
+						else
+							step++;
+					}
 					move();
 					return;
 				}
-			}*/
+			}
 			int rand = (new Random()).nextInt() % 4;
 			if(rand == 0)
 				setHeading(towards(tabRocket[0], -tabRocket[1])); // direction
@@ -438,8 +434,6 @@ public class CMRocketLauncher extends Brain {
 				setHeading(towards(-tabRocket[0], -tabRocket[1]/2)); // direction
 			else
 				setHeading(towards(-tabRocket[0]/2, -tabRocket[1])); // direction
-			esc = true;
-			timeescp = timeescpmax;
 			move();
 			return;
 		}
@@ -497,19 +491,52 @@ public class CMRocketLauncher extends Brain {
 			desobstination();
 			if (temps != tempsMax)
 				return;
-			/* il faudrait sélectionner le launcher le plus rapproché */
-			// arbitrairement on va vers le dernier launcher ayant envoyé un
-			// message
-			directionX = tabHelpL[0][tailleHelpL - 1]
-					+ tabHelpL[2][tailleHelpL - 1];
-			directionY = tabHelpL[1][tailleHelpL - 1]
-					+ tabHelpL[3][tailleHelpL - 1];
+			int inddist = 0;
+			double distmax = 0;
+			for (int i = 0; i < tailleHelpL; i++)
+			{
+				double dist = distanceToAbsolute(tabHelpL[0][i]+tabHelpL[2][i], tabHelpL[1][i]+tabHelpL[3][i]);
+				if(dist < distmax || distmax == 0)
+				{
+					distmax = dist;
+					inddist = i;
+				}
+			}
+			directionX = tabHelpL[0][inddist]
+					+ tabHelpL[2][inddist];
+			directionY = tabHelpL[1][inddist]
+					+ tabHelpL[3][inddist];
+			setHeading(towards(directionX, directionY));
+			move();
+			return;
+		}
+		
+		// E : réception de demande d'aide d'un explorer attaqué
+		if (tailleHelpE > 0) {
+			desobstination();					
+			if (temps != tempsMax)
+				return;
+			int inddist = 0;
+			double distmax = 0;
+			for (int i = 0; i < tailleHelpE; i++)
+			{
+				double dist = distanceToAbsolute(tabHelpE[0][i]+tabHelpE[2][i], tabHelpE[1][i]+tabHelpE[3][i]);
+				if(dist < distmax || distmax == 0)
+				{
+					distmax = dist;
+					inddist = i;
+				}
+			}
+			directionX = tabHelpE[0][inddist]
+					+ tabHelpE[2][inddist];
+			directionY = tabHelpE[1][inddist]
+					+ tabHelpE[3][inddist];
 			setHeading(towards(directionX, directionY));
 			move();
 			return;
 		}
 
-		// E : réception d'un message d'attaque de la base ennemie
+		// F : réception d'un message d'attaque de la base ennemie
 		if (tailleAtaq > 0) {
 			desobstination();
 			if (temps != tempsMax)
@@ -580,6 +607,7 @@ public class CMRocketLauncher extends Brain {
 			}
 		}
 		// Z : déplacement aléatoire
+		step = maxStep;
 		if (getRocketNumber() < 10)
 			buildRocket();
 		else {
