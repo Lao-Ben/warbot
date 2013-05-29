@@ -916,6 +916,19 @@
 		<property name="labelLocation">4</property>
       </graphic-element>
     </node-desc>
+	
+	<node-desc name="TestHitter" class="warbot.kernel.Hitter" category="Test">
+      <icon url="images/warbot/Test/zoro.png"/>
+      <property name="radius">12</property>
+	  <property name="team">Test</property>
+      <property name="detectingrange">80</property>
+	  <property name="energy">4000</property>
+	  <property name="brainClass">warbot.Test.TestHitter</property>
+	  <graphic-element class="warbot.kernel.GBasicBody">
+		<property name="imageaddress">images/warbot/Test/zoro.png</property>
+		<property name="labelLocation">4</property>
+      </graphic-element>
+    </node-desc>
     
 	<node-desc name="TestExplorer" class="warbot.kernel.Explorer" category="Test">
       <icon url="images/warbot/Test/explorer.png"/>

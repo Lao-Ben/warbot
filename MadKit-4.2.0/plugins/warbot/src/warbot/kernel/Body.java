@@ -155,6 +155,8 @@ As the action move, it is useless to call this method several time in the doIt: 
 just one rocket will be launched*/
 public void launchRocket(double direction);
 
+public void Hit(double direction);
+
 
 /**try to do the action of building a rocket for future launch*/
 public void buildRocket();

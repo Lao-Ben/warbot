@@ -321,6 +321,11 @@ For instance it takes 3 turns for a RocketLauncher to be able to send a rocket a
 {
 	myBody.launchRocket(direction);
 }
+ 
+public void Hit(double direction)
+{
+	myBody.Hit(direction);
+}
 
 /**try to do the action of building a rocket for future launch. It takes some
  * energy to build a rocket.
