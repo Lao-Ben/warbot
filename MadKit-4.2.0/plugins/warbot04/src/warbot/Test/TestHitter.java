@@ -8,7 +8,7 @@ import warbot.kernel.WarbotMessage;
 
 public class TestHitter extends Brain{
 	String groupName = "warbot-";
-	String roleName = "Launcher";
+	String roleName = "Hitter";
 
 	final int tempsMax = 10;
 	int temps = tempsMax; // variable permettant de garder la meme direction
@@ -242,7 +242,7 @@ public class TestHitter extends Brain{
 				homeX = currentMsg.getFromX();
 				homeY = currentMsg.getFromY();
 				// setUserMessage(homeX + " ; " + homeY);
-				broadcast(groupName, "Home", "LauncherAlive");
+				broadcast(groupName, "Home", "HitterAlive");
 			}
 		}
 		tailleAtaq = comptAtaq;

@@ -33,6 +33,7 @@ public class CMHome extends Brain
 		int nbAmisProches 				= 0;
 		int nbExplorer					= 0;
 		int nbLauncher					= 0;
+		int nbHitter					= 0;
 		
 		String actMessageAideL 			= "HELP-BL";// cas où risque d'attaque ennemie des launchers
 		String actMessageAideE 			= "HELP-BE";// cas où risque d'attaque ennemie car explorers rôdent
@@ -54,11 +55,16 @@ public class CMHome extends Brain
 			{
 				nbLauncher++;
 			}
+			if(messCourant.getAct() != null && messCourant.getAct() == "HitterAlive")
+			{
+				nbHitter++;
+			}
 		}
 		setUserMessage(Integer.toString(nbExplorer));
 		
 		broadcast(groupName,"Explorer","basepos");
 		broadcast(groupName,"Launcher","basepos");
+		broadcast(groupName,"Hitter","basepos");
 		Percept[]objetsPercus = getPercepts();	// entités dans le périmètre de perception
 		
 		for(int i=0;i<objetsPercus.length;i++)  // pour toutes les entités perçues...
@@ -73,6 +79,7 @@ public class CMHome extends Brain
 					argMessageX = Double.toString(objetCourant.getX());	
 					argMessageY = Double.toString(objetCourant.getY());
 					broadcast(groupName,"Launcher",actMessageAttaque,argMessageX,argMessageY);
+					broadcast(groupName,"Hitter",actMessageAttaque,argMessageX,argMessageY);
 //					println("Base ennemie détectée");
 				}
 				// si la base percoit des explorateurs ennemis
@@ -81,10 +88,11 @@ public class CMHome extends Brain
 					argMessageX = Double.toString(objetCourant.getX());	
 					argMessageY = Double.toString(objetCourant.getY());
 					broadcast(groupName,"Launcher",actMessageAideE,argMessageX,argMessageY);
+					broadcast(groupName,"Hitter",actMessageAideE,argMessageX,argMessageY);
 //					println("Explorer ennemi détecté");
 				}
 				// si la base percoit des launchers ennemis
-				if(objetCourant.getPerceptType().equals("RocketLauncher") && distanceTo(objetCourant) < distanceDetectionLauncher)
+				if((objetCourant.getPerceptType().equals("RocketLauncher") || objetCourant.getPerceptType().equals("Hitter")) && distanceTo(objetCourant) < distanceDetectionLauncher)
 				{
 //					println("Launcher ennemi détecté");
 					nbEnnemisProches ++;
@@ -98,7 +106,7 @@ public class CMHome extends Brain
 				eatFood((Food) objetCourant);
 			}
 			// on regarde le nombre de nos launchers "proches"
-			if (objetCourant.getTeam().equals(getTeam()) && objetCourant.getPerceptType().equals("RocketLauncher") && distanceTo(objetCourant) < distanceSecurite)	
+			if (objetCourant.getTeam().equals(getTeam()) && (objetCourant.getPerceptType().equals("RocketLauncher") || objetCourant.getPerceptType().equals("Hitter")) && distanceTo(objetCourant) < distanceSecurite)	
 				nbAmisProches ++;
 		}
 		// appel à l'aide que si nombre launchers ennemis >= nombre launchers amis
@@ -106,17 +114,26 @@ public class CMHome extends Brain
 		{
 //			println("HELP ! nb ennemis : "+nbEnnemisProches);
 			broadcast(groupName,"Launcher",actMessageAideL,argLauncherX,argLauncherY);
+			broadcast(groupName,"Hitter",actMessageAideL,argLauncherX,argLauncherY);
 
 			if (getResourceLevel() >= 800)
-				createAgent("TestRocketLauncher");
+			{
+				if (nbLauncher <= 2*nbHitter)
+					createAgent("TestRocketLauncher");
+				else
+					createAgent("TestHitter");
+			}
 			return;
 		}
 		if (getResourceLevel() >= 800)
 		{
-			if (nbLauncher > nbExplorer && nbExplorer < 10)
+			if ((nbLauncher+nbHitter) > nbExplorer && nbExplorer < 10)
 				createAgent("TestExplorer");
 			else
-				createAgent("TestRocketLauncher");
+				if (nbLauncher <= 2*nbHitter)
+					createAgent("TestRocketLauncher");
+				else
+					createAgent("TestHitter");
 		}
 			
 	}

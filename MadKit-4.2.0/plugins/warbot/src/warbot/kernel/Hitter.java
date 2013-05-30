@@ -28,7 +28,7 @@ public Hitter()
 
 public Percept makePercept(double dx, double dy, double d){
 	   Percept p = super.makePercept(dx,dy, d);
-	   p.setPerceptType("RocketLauncher");
+	   p.setPerceptType("Hitter");
 	   return p;
 }
 

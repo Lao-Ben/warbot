@@ -131,6 +131,7 @@ public class CMExplorer extends Brain {
 				ennemyX = Double.toString(currentPercept.getX());
 				ennemyY = Double.toString(currentPercept.getY());
 				broadcast(groupName, "Launcher", attackStr, ennemyX, ennemyY);
+				broadcast(groupName, "Hitter", attackStr, ennemyX, ennemyY);
 			}
 		}
 
@@ -138,6 +139,7 @@ public class CMExplorer extends Brain {
 		if (getShot()) {
 			println("explorer attaqué");
 			broadcast(groupName, "Launcher", helpStr, "0", "0");
+			broadcast(groupName, "Hitter", helpStr, "0", "0");
 		}
 
 		// 3. Ennemy rocketlauncher spotted => go away & broadcast
@@ -146,7 +148,8 @@ public class CMExplorer extends Brain {
 		{
 			Percept currentPercept = percepts[i];
 			if (!currentPercept.getTeam().equals(getTeam())
-					&& currentPercept.getPerceptType().equals("RocketLauncher")) // si
+					&& (currentPercept.getPerceptType().equals("RocketLauncher") || 
+							currentPercept.getPerceptType().equals("Hitter"))) // si
 																					// RocketLauncher
 																					// ennemi
 			{
@@ -160,6 +163,7 @@ public class CMExplorer extends Brain {
 				// println(ennemyX);
 				// println(ennemyY);
 				broadcast(groupName, "Launcher", helpStr, ennemyX, ennemyY);
+				broadcast(groupName, "Hitter", helpStr, ennemyX, ennemyY);
 				for (int j = 0; j < percepts.length; j++) // pour toutes les
 															// entités
 															// perçues...
