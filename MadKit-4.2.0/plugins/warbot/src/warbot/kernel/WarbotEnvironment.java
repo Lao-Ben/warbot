@@ -268,6 +268,9 @@ void checkVictory()
 
 boolean authorizeMove(Entity theEntity,double x, double y)
 {
+	if (theEntity instanceof Crossable)
+		return true;
+	
 	Entity[] allEntities = world.getAllEntities();
 
 	//still inside the world

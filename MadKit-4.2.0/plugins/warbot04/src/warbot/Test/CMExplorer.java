@@ -9,7 +9,7 @@ public class CMExplorer extends Brain {
 	 * if the explorer is less than FOOD_DIST_TO_HOME from a home, it doesn't
 	 * eat/take food
 	 */
-	final static int FOOD_DIST_TO_HOME = 60;
+	final static int FOOD_DIST_TO_HOME = 20;
 
 	static enum ExplorerRole {
 		explore,
@@ -118,6 +118,7 @@ public class CMExplorer extends Brain {
 
 		if (baseAlive && myhome != null && distanceTo(myhome) < 2 && bagSize() > 0) {
 			setUserMessage("drop all");
+			setHeading(towards(homeX, homeY));
 			dropAll();
 			setUserMessage((new Integer(this.bagSize())).toString());
 			return;
