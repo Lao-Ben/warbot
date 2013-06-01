@@ -1,8 +1,7 @@
 package warbot.Test;
 
-import java.util.Random;
-
 import warbot.kernel.*;
+
 
 public class CMExplorer extends Brain {
 
@@ -10,8 +9,14 @@ public class CMExplorer extends Brain {
 	 * if the explorer is less than FOOD_DIST_TO_HOME from a home, it doesn't
 	 * eat/take food
 	 */
-	final static int FOOD_DIST_TO_HOME = 10;
+	final static int FOOD_DIST_TO_HOME = 60;
 
+	static enum ExplorerRole {
+		explore,
+		collect,
+		all
+	};
+	
 	String groupName = "warbot-";
 	final static String roleName = "Explorer";
 	final static int maxStep = 8;
@@ -24,7 +29,8 @@ public class CMExplorer extends Brain {
 	Percept myhome = null;
 	double homeX = 0;
 	double homeY = 0;
-	int role = 0;
+	
+	ExplorerRole role;
 
 	public CMExplorer() {
 	}
@@ -37,7 +43,7 @@ public class CMExplorer extends Brain {
 		requestRole(groupName, roleName, null);
 		requestRole(groupName, "mobile", null);
 		this.setUserMessage((new Integer(this.bagSize())).toString());
-		role = Math.abs((new Random().nextInt()) % 2) + 1;
+		role = ExplorerRole.all;
 	}
 
 	int takeFood(Food p) {
@@ -67,6 +73,7 @@ public class CMExplorer extends Brain {
 	public void doIt() {
 		String helpStr 				= "HELP-E";
 		String attackStr 			= "ATAQ";
+		String foodStr				= "FOODFOUND";
 		double ennemyPosX 			= 0;
 		double ennemyPosY 			= 0;
 		String ennemyX 				= "";
@@ -74,16 +81,25 @@ public class CMExplorer extends Brain {
 		boolean enn 				= false;
 		WarbotMessage currentMsg 	= null;
 		boolean baseAlive			= false;
-
+		
+		boolean eating = false;
+		double foodFoundX = -1;
+		double foodFoundY = -1;
+		
 		if (!isMoving()) // if got stuck
 			randomHeading();
 
 		while ((currentMsg = readMessage()) != null) {
-			if (currentMsg.getAct() != null && currentMsg.getAct() == "basepos") {
-				homeX = currentMsg.getFromX();
-				homeY = currentMsg.getFromY();
-				broadcast(groupName, "Home", "ExplorerAlive");
-				baseAlive = true;
+			if (currentMsg.getAct() != null) {
+				if (currentMsg.getAct() == "basepos") {
+					homeX = currentMsg.getFromX();
+					homeY = currentMsg.getFromY();
+					broadcast(groupName, "Home", "ExplorerAlive");
+					baseAlive = true;
+				} else if (currentMsg.getAct() == foodStr) {
+					foodFoundX = currentMsg.getFromX() + Double.valueOf(currentMsg.getArg1());
+					foodFoundY = currentMsg.getFromY() + Double.valueOf(currentMsg.getArg2());
+				}
 			}
 		}
 
@@ -204,7 +220,8 @@ public class CMExplorer extends Brain {
 		}
 
 		// 4. Food percepted
-		if (!enn && role == 1) 
+		if (!enn && 
+				(role == ExplorerRole.collect || role == ExplorerRole.all) )
 		{
 			for (int i = 0; i < percepts.length; i++) // pour toutes les entités
 			// perçues...
@@ -212,10 +229,24 @@ public class CMExplorer extends Brain {
 				Percept currentPercept = percepts[i];
 
 				// if food and not around a home of same team
-				if (currentPercept.getPerceptType().equals("Food")) {
-					if (myhome != null) {
-						println(this.getName() + " -- doIt -- dist2home : "
-								+ distanceTo(myhome));
+				if (currentPercept.getPerceptType().equals("Food")) {					
+					if(eating)
+					{	
+						//println(this.getName() + " -- doIt -- bag size : " + bagSize() + "/" + getBagCapacity());
+						if (bagSize() >= getBagCapacity() - 1)
+						{
+							println(this.getName() + " -- doIt -- broadcast food to take : "	
+								+ currentPercept.getX()
+								+ ","
+								+ currentPercept.getY());
+							broadcast(groupName, "Explorer", foodStr,
+									Double.toString(currentPercept.getX()),
+									Double.toString(currentPercept.getY()));
+						}	
+					}
+					else if (myhome != null) {
+					//	println(this.getName() + " -- doIt -- dist2home : "
+					//			+ distanceTo(myhome));
 						if (distanceTo(myhome) > FOOD_DIST_TO_HOME) {
 							if (!isMyBagFull()) {
 								int j = takeFood((Food) currentPercept);
@@ -225,13 +256,8 @@ public class CMExplorer extends Brain {
 								/*
 								 * else if (j == 1) setUserMessage("eating");
 								 * else setUserMessage("Going to food");
-								 */
-								/*
-								 * broadcast(groupName, "Explorer", "TAKEFOOD",
-								 * Double.toString(currentPercept.getX()),
-								 * Double.toString(currentPercept.getY()));
-								 */
-								return;
+								 */								 
+								eating = true;
 							}
 						}
 					} else {
@@ -249,19 +275,30 @@ public class CMExplorer extends Brain {
 							 * Double.toString(currentPercept.getX()),
 							 * Double.toString(currentPercept.getY()));
 							 */
-							return;
+							eating = true;
 						}
 					}
 				}
 			}
+			//println(this.getName() + " -- doIt -- bag size 2 : " + bagSize() + "/" + getBagCapacity());
+			if (eating)
+				return;
 		}
+		
 
 		if (!enn && bagSize() > 0 && getEnergyLevel() < getInitialEnergyLevel() / 2) {
 			drop(bagSize() - 1);
 			return;
 		}
 
-		// 6. Move
+		
+		// 6. Go to food found by an other explorer
+		if (foodFoundX >= 0 && foodFoundY >= 0) {
+			setHeading(towards(foodFoundX, foodFoundY));
+			println(this.getName() + " -- doIt -- go to found food : " + foodFoundX + "," + foodFoundY);
+		}
+		
+		// 7. Move
 		step = maxStep;
 		move();
 		return;
