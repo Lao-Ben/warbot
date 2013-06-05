@@ -1,9 +1,5 @@
 package warbot.Test;
 
-import java.awt.geom.Point2D;
-
-import madkit.kernel.AgentAddress;
-
 import warbot.kernel.*;
 
 
