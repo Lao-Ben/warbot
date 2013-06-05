@@ -1,5 +1,9 @@
 package warbot.Test;
 
+import java.awt.geom.Point2D;
+
+import madkit.kernel.AgentAddress;
+
 import warbot.kernel.*;
 
 
@@ -21,6 +25,7 @@ public class CMExplorer extends Brain {
 	final static String roleName = "Explorer";
 	final static int maxStep = 8;
 
+	
 	/**
 	 * step : used to keep direction during maxStep steps
 	 */
@@ -32,6 +37,9 @@ public class CMExplorer extends Brain {
 	
 	ExplorerRole role;
 
+	Boolean takingFood = false;
+	String foodIdToTake = null;
+	
 	public CMExplorer() {
 	}
 
@@ -43,7 +51,7 @@ public class CMExplorer extends Brain {
 		requestRole(groupName, roleName, null);
 		requestRole(groupName, "mobile", null);
 		this.setUserMessage((new Integer(this.bagSize())).toString());
-		role = ExplorerRole.all;
+		role = ExplorerRole.explore;
 	}
 
 	int takeFood(Food p) {
@@ -69,11 +77,48 @@ public class CMExplorer extends Brain {
 			return 2;
 		}
 	}
+	
+	/**
+	 * Percept food entities
+	 * 
+	 * 1. Percept food
+	 * 2. send message to homes if food percepted
+	 * 
+	 * TODO: improve it (all home's foodlists are filled with the same elements)
+	 * 		should have a Master Home that contains the "blackboard"
+	 */
+	private void perceptFood() {
+		Percept[] percepts = getPercepts();
+		for (int i = 0; i < percepts.length; i++) {
+			Percept currentPercept = percepts[i];
+			// if food and not around a home of same team
+			if (currentPercept.getPerceptType().equals("Food")) {	
+				if (role == ExplorerRole.collect
+					&& String.valueOf(System.identityHashCode(currentPercept)) == foodIdToTake) {
+					if (takeFood((Food) currentPercept) < 2)
+					{
+						role = ExplorerRole.explore;
+						foodIdToTake = null;
+					}
+				}
+				
+				//println(this.getName() + " -- doIt -- broadcast food to take : "	
+				//		+ currentPercept.getX()
+				//		+ ","
+				//		+ currentPercept.getY());
+				broadcast(groupName, "Home", Constants.MSG_FOODFOUND, new String[] {
+						Double.toString(currentPercept.getX()),
+						Double.toString(currentPercept.getY()),
+						String.valueOf(System.identityHashCode(currentPercept))});
+			}
+		}
+	}
 
+	
+	
 	public void doIt() {
 		String helpStr 				= "HELP-E";
 		String attackStr 			= "ATAQ";
-		String foodStr				= "FOODFOUND";
 		double ennemyPosX 			= 0;
 		double ennemyPosY 			= 0;
 		String ennemyX 				= "";
@@ -96,9 +141,15 @@ public class CMExplorer extends Brain {
 					homeY = currentMsg.getFromY();
 					broadcast(groupName, "Home", "ExplorerAlive");
 					baseAlive = true;
-				} else if (currentMsg.getAct() == foodStr) {
+				} else if (currentMsg.getAct() == Constants.MSG_TAKEFOOD) {
+					if (!isMyBagFull()) { 
+						broadcast(groupName, "Home", Constants.MSG_TAKINGFOOD, currentMsg.getArgN(3));
+					}
+				} else if (currentMsg.getAct() == Constants.MSG_TAKINGFOODACK) {
 					foodFoundX = currentMsg.getFromX() + Double.valueOf(currentMsg.getArg1());
 					foodFoundY = currentMsg.getFromY() + Double.valueOf(currentMsg.getArg2());
+					foodIdToTake = currentMsg.getArgN(3);
+					role = ExplorerRole.collect;
 				}
 			}
 		}
@@ -220,6 +271,8 @@ public class CMExplorer extends Brain {
 			}
 		}
 
+		perceptFood();
+		
 		// 4. Food percepted
 		if (!enn && 
 				(role == ExplorerRole.collect || role == ExplorerRole.all) )
@@ -240,9 +293,11 @@ public class CMExplorer extends Brain {
 								+ currentPercept.getX()
 								+ ","
 								+ currentPercept.getY());
-							broadcast(groupName, "Explorer", foodStr,
+							// TODO: improve it (all home's foodlists are filled with the same elements)
+							broadcast(groupName, "Home", Constants.MSG_FOODFOUND, new String[] {
 									Double.toString(currentPercept.getX()),
-									Double.toString(currentPercept.getY()));
+									Double.toString(currentPercept.getY()),
+									String.valueOf(System.identityHashCode(currentPercept))});
 						}	
 					}
 					else if (myhome != null) {
