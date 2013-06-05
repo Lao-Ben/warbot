@@ -4,9 +4,6 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
 
 import madkit.kernel.AgentAddress;
 
@@ -21,16 +18,16 @@ public class CMHome extends Brain
 	String groupName="warbot-";
 	final static String roleName="Home";
 
-	LinkedHashMap rcvFoodList;
-	LinkedHashMap sntFoodList;
-	LinkedHashMap lastCollectors;
+	HashMap<String, Point2D> rcvFoodList;
+	HashMap<String, Integer> sntFoodList;
+	HashMap<AgentAddress, Integer> lastCollectors;
 	final static int stepsBeforeReply 		= 4;
 	final static int stepsToKeepCollectors 	= 6;
 	
 	public CMHome(){
-		rcvFoodList		= new LinkedHashMap();
-		sntFoodList 	= new LinkedHashMap();
-		lastCollectors 	= new LinkedHashMap();
+		rcvFoodList		= new HashMap<String, Point2D>();
+		sntFoodList 	= new HashMap<String, Integer>();
+		lastCollectors 	= new HashMap<AgentAddress, Integer>();
 	}
 	
 	void eatFood(Food p){
@@ -123,7 +120,7 @@ public class CMHome extends Brain
 	 * 
 	 * @param id the id of the food entity
 	 */
-	private void letExplorersHandleFood(LinkedHashMap candidates) {
+	private void letExplorersHandleFood(HashMap<String, ArrayList<AgentAddress>> candidates) {
 		if (candidates == null || candidates.isEmpty())
 			return;
 		
@@ -205,7 +202,7 @@ public class CMHome extends Brain
 		
 		WarbotMessage currentMsg		= null;
 		
-		LinkedHashMap currentCollectors = new LinkedHashMap();
+		HashMap<String, ArrayList<AgentAddress>> currentCollectors = new HashMap<String, ArrayList<AgentAddress>>();
 		
 		while((currentMsg = readMessage())!= null)
 		{
