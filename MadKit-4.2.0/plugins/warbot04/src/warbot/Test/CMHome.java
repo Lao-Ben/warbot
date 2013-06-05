@@ -5,12 +5,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
 import madkit.kernel.AgentAddress;
-
-import com.sun.tools.javac.util.Pair;
-import com.sun.tools.jdi.LinkedHashMap;
 
 import warbot.kernel.*;
 
@@ -217,7 +215,10 @@ public class CMHome extends Brain
 					nbExplorer++;
 				} else if(currentMsg.getAct() == "LauncherAlive") {
 					nbLauncher++;
-				} else if (currentMsg.getAct() == Constants.MSG_FOODFOUND) {
+				} 
+				else if(currentMsg.getAct() == "HitterAlive")
+					nbHitter++;
+				else if (currentMsg.getAct() == Constants.MSG_FOODFOUND) {
 					// add food to the LinkedHashMap
 					storeFood(currentMsg.getArgN(3),
 							currentMsg.getFromX() + Double.valueOf(currentMsg.getArg1()),
@@ -232,14 +233,6 @@ public class CMHome extends Brain
 					else
 						currentCollectors.put(foodId, new ArrayList<AgentAddress>(Arrays.asList(currentMsg.getSender())));
 				}
-			}
-			if(messCourant.getAct() != null && messCourant.getAct() == "LauncherAlive")
-			{
-				nbLauncher++;
-			}
-			if(messCourant.getAct() != null && messCourant.getAct() == "HitterAlive")
-			{
-				nbHitter++;
 			}
 		}
 

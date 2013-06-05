@@ -942,32 +942,6 @@
 		<property name="labelLocation">4</property>
       </graphic-element>
     </node-desc>
-	
-	<node-desc name="TestFoodExplorer" class="warbot.kernel.Explorer" category="Test">
-      <icon url="images/warbot/Test/foodexplorer.png"/>
-      <property name="radius">12</property>
-	  <property name="team">Test</property>
-      <property name="detectingrange">130</property>
-	  <property name="energy">1000</property>
-	  <property name="brainClass">warbot.Test.FoodExplorer</property>
-      <graphic-element class="warbot.kernel.GBasicBody">
-		<property name="imageaddress">images/warbot/Test/foodexplorer.png</property>
-		<property name="labelLocation">4</property>
-      </graphic-element>
-    </node-desc>
-	
-	<node-desc name="TestNoFoodExplorer" class="warbot.kernel.Explorer" category="Test">
-      <icon url="images/warbot/Test/nami.gif"/>
-      <property name="radius">12</property>
-	  <property name="team">Test</property>
-      <property name="detectingrange">130</property>
-	  <property name="energy">1000</property>
-	  <property name="brainClass">warbot.Test.NoFoodExplorer</property>
-      <graphic-element class="warbot.kernel.GBasicBody">
-		<property name="imageaddress">images/warbot/Test/nami.gif</property>
-		<property name="labelLocation">4</property>
-      </graphic-element>
-    </node-desc>
 
 	<node-desc name="TestHome" class="warbot.kernel.Home" category="Test">
       <icon url="images/warbot/Test/base.png"/>
