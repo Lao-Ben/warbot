@@ -95,6 +95,10 @@ public class Rocket extends MovableEntity
     void update() {
     }
 
+    public void setPower(int pow)
+    {
+    	power = pow;
+    }
 
     void getMissileShot(int value)
     {

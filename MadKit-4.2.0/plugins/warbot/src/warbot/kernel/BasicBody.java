@@ -474,6 +474,10 @@ public void launchRocket(double direction){
     System.out.println(":: LaunchRocket" + " not accessible from " + this);
 }
 
+public void Hit(double direction){
+    System.out.println(":: Hit" + " not accessible from " + this);
+}
+
 
 /**try to do the action of building a rocket for future launch*/
 public void buildRocket(){

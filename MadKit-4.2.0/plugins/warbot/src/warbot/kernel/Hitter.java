@@ -1,54 +1,34 @@
-/*
-* RocketLauncher.java -Warbot: robots battles in MadKit
-* Copyright (C) 2000-2002 Fabien Michel, Jacques Ferber
-*
-* This program is free software; you can redistribute it and/or
-* modify it under the terms of the GNU General Public License
-* as published by the Free Software Foundation; either version 2
-* of the License, or any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-*/
 package warbot.kernel;
 
 import java.awt.Point;
 
-
-public class RocketLauncher extends BasicBody
-{
-	final static protected int maximumRocket = 10;
-	protected int rocketNb=10;
+public class Hitter extends BasicBody{
+	final static protected int maximumRocket = 30;
+	protected int rocketNb=30;
 	final protected static int SHOOT=10; //ACTION DESCRIPTION
 	final protected static int BUILD_ROCKET=11; //ACTION DESCRIPTION
 	final protected static int HIT=12; //ACTION DESCRIPTION
 	private double rocketDirection=0;
 
-public RocketLauncher(WarbotEnvironment env,Brain b,String team)
+public Hitter(WarbotEnvironment env,Brain b,String team)
 {
-	super(env,b,"rocket launcher",team,15,8000,45);
-	setSpeed(3);
+	super(env,b,"hitter",team,15,8000,45);
+	setSpeed(1);
 	rocketNb = maximumRocket;
 }
 
-public RocketLauncher()
+public Hitter()
 {
     super();
 	setDetectingRange(45);
-	setSpeed(3);
+	setSpeed(1);
 	maximumEnergy=8000;
 	rocketNb = maximumRocket;
 }
 
 public Percept makePercept(double dx, double dy, double d){
 	   Percept p = super.makePercept(dx,dy, d);
-	   p.setPerceptType("RocketLauncher");
+	   p.setPerceptType("Hitter");
 	   return p;
 }
 
@@ -111,7 +91,6 @@ void tryHit()
         getStructure().getAgent().doCommand(new SEdit.NewNodeCommand("Rocket",new Point(0,0)));
         Rocket r = (Rocket)((WarbotStructure)getStructure()).getLastEntity();
         r.setTeam(team);
-        r.setPower(400);
         r.setHeading(rocketDirection);
         r.setXY( (radius+r.getRadius()+1)*r.getCosAlpha()+x,(radius+r.getRadius()+1)*r.getSinAlpha()+y);
 
@@ -155,5 +134,4 @@ void doAction()
         super.doAction();
 	}
 }
-
 }

@@ -129,12 +129,12 @@ public abstract class Brain extends AbstractAgent implements ReferenceableAgent,
 } */
 
 /** returns the distance relative to the absolute point a,b */
-/*public double distanceToAbsolute(double a, double b)
+public double distanceToAbsolute(double a, double b)
 {
 	double x = ((BasicBody)getBody()).getX();
 	double y = ((BasicBody)getBody()).getY();
   	return Math.sqrt( Math.pow(a-x,2) + Math.pow(b-y,2) ) - myBody.getRadius();
-} */
+}
 
 /** returns the distance relative to the perceived entity */
 public double distanceTo(Percept p)
@@ -320,6 +320,11 @@ For instance it takes 3 turns for a RocketLauncher to be able to send a rocket a
  public void launchRocket(double direction)
 {
 	myBody.launchRocket(direction);
+}
+ 
+public void Hit(double direction)
+{
+	myBody.Hit(direction);
 }
 
 /**try to do the action of building a rocket for future launch. It takes some
