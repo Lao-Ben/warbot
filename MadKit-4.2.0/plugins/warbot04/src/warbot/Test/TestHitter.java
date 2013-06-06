@@ -2,8 +2,6 @@ package warbot.Test;
 
 import java.util.Random;
 
-import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
-
 import warbot.kernel.Brain;
 import warbot.kernel.Percept;
 import warbot.kernel.WarbotMessage;

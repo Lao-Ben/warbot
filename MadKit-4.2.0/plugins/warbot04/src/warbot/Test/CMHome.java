@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
-
 import madkit.kernel.AgentAddress;
 
 import warbot.kernel.*;

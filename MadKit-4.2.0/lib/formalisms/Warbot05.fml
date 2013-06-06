@@ -151,7 +151,7 @@
     </node-desc>
 	
 	<node-desc name="Sword" class="warbot.kernel.Sword" category="objects">
-      <icon url="images/world/sword.jpg"/>
+      <icon url="images/world/sabre.png"/>
       <property name="radius">1</property>
 	  <property name="energy">100</property>
       <graphic-element class="warbot.kernel.GEntity">
