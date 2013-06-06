@@ -20,7 +20,7 @@ public class TestHitter extends Brain{
 
 	final int maxStep = 8;
 	int step = 0;
-	boolean sendAlive = false;
+	//boolean sendAlive = false;
 
 	public TestHitter() {
 	}
@@ -248,11 +248,11 @@ public class TestHitter extends Brain{
 				baseAlive = true;
 				homeX = currentMsg.getFromX();
 				homeY = currentMsg.getFromY();
-				if (!sendAlive)
+				/*if (!sendAlive)
 				{
 					broadcast(groupName, "Home", Constants.MSG_HITTERALIVE);
 					sendAlive = true;
-				}
+				}*/
 			}
 		}
 		tailleAtaq = comptAtaq;

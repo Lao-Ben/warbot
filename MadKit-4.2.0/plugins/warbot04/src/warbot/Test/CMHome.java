@@ -208,19 +208,7 @@ public class CMHome extends Brain
 		{
 			if(currentMsg.getAct() != null)
 			{
-				if(currentMsg.getAct() == Constants.MSG_EXPLORERALIVE)
-					nbExplorer++;
-				else if(currentMsg.getAct() == Constants.MSG_LAUNCHERALIVE)
-					nbLauncher++;
-				else if(currentMsg.getAct() == Constants.MSG_HITTERALIVE)
-					nbHitter++;
-				else if(currentMsg.getAct() == Constants.MSG_EXPLORERDEAD)
-					nbExplorer--;
-				else if(currentMsg.getAct() == Constants.MSG_HITTERDEAD)
-					nbHitter--;
-				else if(currentMsg.getAct() == Constants.MSG_LAUNCHERDEAD)
-					nbLauncher--;
-				else if (currentMsg.getAct() == Constants.MSG_FOODFOUND) {
+				if (currentMsg.getAct() == Constants.MSG_FOODFOUND) {
 					// add food to the LinkedHashMap
 					storeFood(currentMsg.getArgN(3),
 							currentMsg.getFromX() + Double.valueOf(currentMsg.getArg1()),
@@ -256,6 +244,13 @@ public class CMHome extends Brain
 		broadcast(groupName,"Explorer",Constants.MSG_BASEPOS);
 		broadcast(groupName,"Launcher",Constants.MSG_BASEPOS);
 		broadcast(groupName,"Hitter",Constants.MSG_BASEPOS);
+		AgentAddress[] tabInfo = getAgentsWithRole(groupName, "Explorer");
+		nbExplorer = tabInfo.length;
+		tabInfo = getAgentsWithRole(groupName, "Launcher");
+		nbLauncher = tabInfo.length;
+		tabInfo = getAgentsWithRole(groupName, "Hitter");
+		nbHitter = tabInfo.length;
+		
 		Percept[]objetsPercus = getPercepts();	// entités dans le périmètre de perception
 		
 		for(int i=0;i<objetsPercus.length;i++)  // pour toutes les entités perçues...

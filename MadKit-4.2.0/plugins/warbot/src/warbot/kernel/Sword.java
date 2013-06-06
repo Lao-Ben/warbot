@@ -9,7 +9,7 @@ public class Sword extends MovableEntity
 {
 	protected static ImageIcon rocketGif=null;
 
-    protected int power = 200;
+    protected int power = 100;
 
 	public Sword(WarbotEnvironment env,double direction)
 	{

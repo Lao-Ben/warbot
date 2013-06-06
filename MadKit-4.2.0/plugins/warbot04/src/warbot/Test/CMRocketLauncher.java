@@ -19,7 +19,7 @@ public class CMRocketLauncher extends Brain {
 	final int maxStep = 8;
 	int step = 0;
 	
-	boolean sendAlive = false;
+	//boolean sendAlive = false;
 
 	public CMRocketLauncher() {
 	}
@@ -267,11 +267,11 @@ public class CMRocketLauncher extends Brain {
 				homeX = currentMsg.getFromX();
 				homeY = currentMsg.getFromY();
 				// setUserMessage(homeX + " ; " + homeY);
-				if (!sendAlive)
+				/*if (!sendAlive)
 				{
 					broadcast(groupName, "Home", Constants.MSG_LAUNCHERALIVE);
 					sendAlive = true;
-				}
+				}*/
 			}
 		}
 		tailleAtaq = comptAtaq;

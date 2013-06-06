@@ -36,7 +36,7 @@ public class CMExplorer extends Brain {
 	Boolean takingFood = false;
 	String foodIdToTake = null;
 	
-	boolean sendAlive = false;
+	//boolean sendAlive = false;
 	
 	public CMExplorer() {
 	}
@@ -141,11 +141,11 @@ public class CMExplorer extends Brain {
 				if (currentMsg.getAct() == Constants.MSG_BASEPOS) {
 					homeX = currentMsg.getFromX();
 					homeY = currentMsg.getFromY();
-					if (!sendAlive)
+					/*if (!sendAlive)
 					{
 						broadcast(groupName, "Home", Constants.MSG_EXPLORERALIVE);
 						sendAlive = true;
-					}
+					}*/
 					baseAlive = true;
 				} else if (currentMsg.getAct() == Constants.MSG_TAKEFOOD) {
 					if (!isMyBagFull()) { 
