@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 import madkit.kernel.AgentAddress;
+
 import warbot.kernel.*;
 
 /**
@@ -22,6 +23,9 @@ public class CMHome extends Brain
 	HashMap<AgentAddress, Integer> lastCollectors;
 	final static int stepsBeforeReply 		= 4;
 	final static int stepsToKeepCollectors 	= 6;
+	int nbExplorer							= 0;
+	int nbLauncher							= 0;
+	int nbHitter							= 0;
 	
 	public CMHome(){
 		rcvFoodList		= new HashMap<String, Point2D>();
@@ -187,9 +191,6 @@ public class CMHome extends Brain
 		int distanceSecurite 			= 150;		// périmètre de sécurité
 		int nbEnnemisProches 			= 0;
 		int nbAmisProches 				= 0;
-		int nbExplorer					= 0;
-		int nbLauncher					= 0;
-		int nbHitter					= 0;
 		
 		String actMessageAideL 			= "HELP-BL";// cas où risque d'attaque ennemie des launchers
 		String actMessageAideE 			= "HELP-BE";// cas où risque d'attaque ennemie car explorers rôdent
@@ -207,13 +208,7 @@ public class CMHome extends Brain
 		{
 			if(currentMsg.getAct() != null)
 			{
-				if(currentMsg.getAct() == "ExplorerAlive") {
-					nbExplorer++;
-				} else if(currentMsg.getAct() == "LauncherAlive") {
-					nbLauncher++;
-				} else if(currentMsg.getAct() == "HitterAlive") {
-					nbHitter++;
-				} else if (currentMsg.getAct() == Constants.MSG_FOODFOUND) {
+				if (currentMsg.getAct() == Constants.MSG_FOODFOUND) {
 					// add food to the LinkedHashMap
 					storeFood(currentMsg.getArgN(3),
 							currentMsg.getFromX() + Double.valueOf(currentMsg.getArg1()),
@@ -246,9 +241,16 @@ public class CMHome extends Brain
 		
 		setUserMessage(Integer.toString(nbExplorer));
 		
-		broadcast(groupName,"Explorer","basepos");
-		broadcast(groupName,"Launcher","basepos");
-		broadcast(groupName,"Hitter","basepos");
+		broadcast(groupName,"Explorer",Constants.MSG_BASEPOS);
+		broadcast(groupName,"Launcher",Constants.MSG_BASEPOS);
+		broadcast(groupName,"Hitter",Constants.MSG_BASEPOS);
+		AgentAddress[] tabInfo = getAgentsWithRole(groupName, "Explorer");
+		nbExplorer = tabInfo.length;
+		tabInfo = getAgentsWithRole(groupName, "Launcher");
+		nbLauncher = tabInfo.length;
+		tabInfo = getAgentsWithRole(groupName, "Hitter");
+		nbHitter = tabInfo.length;
+		
 		Percept[]objetsPercus = getPercepts();	// entités dans le périmètre de perception
 		
 		for(int i=0;i<objetsPercus.length;i++)  // pour toutes les entités perçues...

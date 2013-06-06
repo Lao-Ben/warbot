@@ -36,6 +36,8 @@ public class CMExplorer extends Brain {
 	Boolean takingFood = false;
 	String foodIdToTake = null;
 	
+	//boolean sendAlive = false;
+	
 	public CMExplorer() {
 	}
 
@@ -110,7 +112,11 @@ public class CMExplorer extends Brain {
 		}
 	}
 
-	
+	public void end()
+	{
+	    broadcast(groupName, "Home", Constants.MSG_EXPLORERDEAD);
+	    println("ID Dead (me-explorer) : "+getAddress().getLocalID());
+	}
 	
 	public void doIt() {
 		String helpStr 				= "HELP-E";
@@ -132,10 +138,14 @@ public class CMExplorer extends Brain {
 
 		while ((currentMsg = readMessage()) != null) {
 			if (currentMsg.getAct() != null) {
-				if (currentMsg.getAct() == "basepos") {
+				if (currentMsg.getAct() == Constants.MSG_BASEPOS) {
 					homeX = currentMsg.getFromX();
 					homeY = currentMsg.getFromY();
-					broadcast(groupName, "Home", "ExplorerAlive");
+					/*if (!sendAlive)
+					{
+						broadcast(groupName, "Home", Constants.MSG_EXPLORERALIVE);
+						sendAlive = true;
+					}*/
 					baseAlive = true;
 				} else if (currentMsg.getAct() == Constants.MSG_TAKEFOOD) {
 					if (!isMyBagFull()) { 

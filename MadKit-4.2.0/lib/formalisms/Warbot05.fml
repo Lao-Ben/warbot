@@ -149,6 +149,16 @@
 		<property name="displaylabel">false</property>
       </graphic-element>
     </node-desc>
+	
+	<node-desc name="Sword" class="warbot.kernel.Sword" category="objects">
+      <icon url="images/world/sabre.png"/>
+      <property name="radius">1</property>
+	  <property name="energy">100</property>
+      <graphic-element class="warbot.kernel.GEntity">
+		<property name="imageaddress">images/world/sword.jpg</property>
+		<property name="displaylabel">false</property>
+      </graphic-element>
+    </node-desc>
 
        <node-desc name="privatMissileLauncher" class="warbot.kernel.RocketLauncher" category="Privat">
       <icon url="images/warbot/cyanrocketlauncher.gif"/>
@@ -939,32 +949,6 @@
 	  <property name="brainClass">warbot.Test.CMExplorer</property>
       <graphic-element class="warbot.kernel.GBasicBody">
 		<property name="imageaddress">images/warbot/Test/explorer.png</property>
-		<property name="labelLocation">4</property>
-      </graphic-element>
-    </node-desc>
-	
-	<node-desc name="TestFoodExplorer" class="warbot.kernel.Explorer" category="Test">
-      <icon url="images/warbot/Test/foodexplorer.png"/>
-      <property name="radius">12</property>
-	  <property name="team">Test</property>
-      <property name="detectingrange">130</property>
-	  <property name="energy">1000</property>
-	  <property name="brainClass">warbot.Test.FoodExplorer</property>
-      <graphic-element class="warbot.kernel.GBasicBody">
-		<property name="imageaddress">images/warbot/Test/foodexplorer.png</property>
-		<property name="labelLocation">4</property>
-      </graphic-element>
-    </node-desc>
-	
-	<node-desc name="TestNoFoodExplorer" class="warbot.kernel.Explorer" category="Test">
-      <icon url="images/warbot/Test/nami.gif"/>
-      <property name="radius">12</property>
-	  <property name="team">Test</property>
-      <property name="detectingrange">130</property>
-	  <property name="energy">1000</property>
-	  <property name="brainClass">warbot.Test.NoFoodExplorer</property>
-      <graphic-element class="warbot.kernel.GBasicBody">
-		<property name="imageaddress">images/warbot/Test/nami.gif</property>
 		<property name="labelLocation">4</property>
       </graphic-element>
     </node-desc>

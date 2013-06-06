@@ -18,6 +18,8 @@ public class CMRocketLauncher extends Brain {
 
 	final static int maxStep = 8;
 	int step = 0;
+	
+	//boolean sendAlive = false;
 
 	static enum RocketLauncherRole {
 		alone,
@@ -117,6 +119,12 @@ public class CMRocketLauncher extends Brain {
 		launchRocket(directionTir);
 	}
 
+	public void end()
+	{
+	    broadcast(groupName, "Home", Constants.MSG_LAUNCHERDEAD);
+	    println("ID Dead (me-launcher) : "+getAddress().getLocalID());
+	}
+	
 	public void doIt() {
 		// variables pour gestion des messages
 		double[][] tabAtaq = new double[4][100]; // tableau des message
@@ -541,7 +549,7 @@ public class CMRocketLauncher extends Brain {
 				}
 				// rocket detected
 				if (objetCourant.getPerceptType().equals("Rocket")
-						&& distanceTo(objetCourant) < 4
+						&& distanceTo(objetCourant) < 15
 						&& !objetCourant.getTeam().equals(getTeam())) {
 					if (distanceTo(objetCourant) < tabRocket[2]
 							|| tabRocket[2] == 0) {

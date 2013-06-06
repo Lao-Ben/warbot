@@ -20,6 +20,7 @@ public class TestHitter extends Brain{
 
 	final int maxStep = 8;
 	int step = 0;
+	//boolean sendAlive = false;
 
 	public TestHitter() {
 	}
@@ -31,6 +32,12 @@ public class TestHitter extends Brain{
 		createGroup(false, groupName, null, null);
 		requestRole(groupName, roleName, null);
 		requestRole(groupName, "mobile", null);
+	}
+	
+	public void end()
+	{
+	    broadcast(groupName, "Home", Constants.MSG_HITTERDEAD);
+	    println("ID Dead (me-hitter) : "+getAddress().getLocalID());
 	}
 
 	public void desobstination() {
@@ -237,12 +244,15 @@ public class TestHitter extends Brain{
 				tabHelpE[3][comptHelpE] = currentMsg.getFromY();
 				comptHelpE++;
 			}
-			if (currentMsg.getAct() != null && currentMsg.getAct() == "basepos") {
+			if (currentMsg.getAct() != null && currentMsg.getAct() == Constants.MSG_BASEPOS) {
 				baseAlive = true;
 				homeX = currentMsg.getFromX();
 				homeY = currentMsg.getFromY();
-				// setUserMessage(homeX + " ; " + homeY);
-				broadcast(groupName, "Home", "HitterAlive");
+				/*if (!sendAlive)
+				{
+					broadcast(groupName, "Home", Constants.MSG_HITTERALIVE);
+					sendAlive = true;
+				}*/
 			}
 		}
 		tailleAtaq = comptAtaq;
@@ -370,7 +380,7 @@ public class TestHitter extends Brain{
 				}
 				// rocket detected
 				if (objetCourant.getPerceptType().equals("Rocket")
-						&& distanceTo(objetCourant) < 4
+						&& distanceTo(objetCourant) < 15
 						&& !objetCourant.getTeam().equals(getTeam())) {
 					if (distanceTo(objetCourant) < tabRocket[2]
 							|| tabRocket[2] == 0) {

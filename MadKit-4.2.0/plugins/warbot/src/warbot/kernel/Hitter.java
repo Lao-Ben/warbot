@@ -88,8 +88,8 @@ void tryHit()
 	{
 		//Rocket r=new Rocket(myWorld,rocketDirection);
 
-        getStructure().getAgent().doCommand(new SEdit.NewNodeCommand("Rocket",new Point(0,0)));
-        Rocket r = (Rocket)((WarbotStructure)getStructure()).getLastEntity();
+        getStructure().getAgent().doCommand(new SEdit.NewNodeCommand("Sword",new Point(0,0)));
+        Sword r = (Sword)((WarbotStructure)getStructure()).getLastEntity();
         r.setTeam(team);
         r.setHeading(rocketDirection);
         r.setXY( (radius+r.getRadius()+1)*r.getCosAlpha()+x,(radius+r.getRadius()+1)*r.getSinAlpha()+y);
