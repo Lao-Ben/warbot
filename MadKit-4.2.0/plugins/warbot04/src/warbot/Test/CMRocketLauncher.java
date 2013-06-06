@@ -393,7 +393,7 @@ public class CMRocketLauncher extends Brain {
 				}
 				// rocket detected
 				if (objetCourant.getPerceptType().equals("Rocket")
-						&& distanceTo(objetCourant) < 10
+						&& distanceTo(objetCourant) < 15
 						&& !objetCourant.getTeam().equals(getTeam())) {
 					if (distanceTo(objetCourant) < tabRocket[2]
 							|| tabRocket[2] == 0) {
