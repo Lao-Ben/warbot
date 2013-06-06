@@ -2,6 +2,8 @@ package warbot.Test;
 
 import java.util.Random;
 
+import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
+
 import warbot.kernel.Brain;
 import warbot.kernel.Percept;
 import warbot.kernel.WarbotMessage;
@@ -36,7 +38,7 @@ public class TestHitter extends Brain{
 	
 	public void end()
 	{
-	    broadcast(groupName, "Home", "HitterDead");
+	    broadcast(groupName, "Home", Constants.MSG_HITTERDEAD);
 	    println("ID Dead (me-hitter) : "+getAddress().getLocalID());
 	}
 
@@ -244,13 +246,13 @@ public class TestHitter extends Brain{
 				tabHelpE[3][comptHelpE] = currentMsg.getFromY();
 				comptHelpE++;
 			}
-			if (currentMsg.getAct() != null && currentMsg.getAct() == "basepos") {
+			if (currentMsg.getAct() != null && currentMsg.getAct() == Constants.MSG_BASEPOS) {
 				baseAlive = true;
 				homeX = currentMsg.getFromX();
 				homeY = currentMsg.getFromY();
 				if (!sendAlive)
 				{
-					broadcast(groupName, "Home", "HitterAlive");
+					broadcast(groupName, "Home", Constants.MSG_HITTERALIVE);
 					sendAlive = true;
 				}
 			}

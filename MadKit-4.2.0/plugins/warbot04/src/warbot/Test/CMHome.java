@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import com.sun.xml.internal.bind.v2.runtime.reflect.opt.Const;
+
 import madkit.kernel.AgentAddress;
 
 import warbot.kernel.*;
@@ -208,17 +210,17 @@ public class CMHome extends Brain
 		{
 			if(currentMsg.getAct() != null)
 			{
-				if(currentMsg.getAct() == "ExplorerAlive")
+				if(currentMsg.getAct() == Constants.MSG_EXPLORERALIVE)
 					nbExplorer++;
-				else if(currentMsg.getAct() == "LauncherAlive")
+				else if(currentMsg.getAct() == Constants.MSG_LAUNCHERALIVE)
 					nbLauncher++;
-				else if(currentMsg.getAct() == "HitterAlive")
+				else if(currentMsg.getAct() == Constants.MSG_HITTERALIVE)
 					nbHitter++;
-				else if(currentMsg.getAct() == "ExplorerDead")
+				else if(currentMsg.getAct() == Constants.MSG_EXPLORERDEAD)
 					nbExplorer--;
-				else if(currentMsg.getAct() == "HitterDead")
+				else if(currentMsg.getAct() == Constants.MSG_HITTERDEAD)
 					nbHitter--;
-				else if(currentMsg.getAct() == "LauncherDead")
+				else if(currentMsg.getAct() == Constants.MSG_LAUNCHERDEAD)
 					nbLauncher--;
 				else if (currentMsg.getAct() == Constants.MSG_FOODFOUND) {
 					// add food to the LinkedHashMap
@@ -253,9 +255,9 @@ public class CMHome extends Brain
 		
 		setUserMessage(Integer.toString(nbExplorer));
 		
-		broadcast(groupName,"Explorer","basepos");
-		broadcast(groupName,"Launcher","basepos");
-		broadcast(groupName,"Hitter","basepos");
+		broadcast(groupName,"Explorer",Constants.MSG_BASEPOS);
+		broadcast(groupName,"Launcher",Constants.MSG_BASEPOS);
+		broadcast(groupName,"Hitter",Constants.MSG_BASEPOS);
 		Percept[]objetsPercus = getPercepts();	// entités dans le périmètre de perception
 		
 		for(int i=0;i<objetsPercus.length;i++)  // pour toutes les entités perçues...

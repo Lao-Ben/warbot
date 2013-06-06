@@ -114,7 +114,7 @@ public class CMExplorer extends Brain {
 
 	public void end()
 	{
-	    broadcast(groupName, "Home", "ExplorerDead");
+	    broadcast(groupName, "Home", Constants.MSG_EXPLORERDEAD);
 	    println("ID Dead (me-explorer) : "+getAddress().getLocalID());
 	}
 	
@@ -138,12 +138,12 @@ public class CMExplorer extends Brain {
 
 		while ((currentMsg = readMessage()) != null) {
 			if (currentMsg.getAct() != null) {
-				if (currentMsg.getAct() == "basepos") {
+				if (currentMsg.getAct() == Constants.MSG_BASEPOS) {
 					homeX = currentMsg.getFromX();
 					homeY = currentMsg.getFromY();
 					if (!sendAlive)
 					{
-						broadcast(groupName, "Home", "ExplorerAlive");
+						broadcast(groupName, "Home", Constants.MSG_EXPLORERALIVE);
 						sendAlive = true;
 					}
 					baseAlive = true;

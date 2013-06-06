@@ -84,7 +84,7 @@ public class CMRocketLauncher extends Brain {
 
 	public void end()
 	{
-	    broadcast(groupName, "Home", "LauncherDead");
+	    broadcast(groupName, "Home", Constants.MSG_LAUNCHERDEAD);
 	    println("ID Dead (me-launcher) : "+getAddress().getLocalID());
 	}
 	
@@ -262,14 +262,14 @@ public class CMRocketLauncher extends Brain {
 				tabHelpE[3][comptHelpE] = currentMsg.getFromY();
 				comptHelpE++;
 			}
-			if (currentMsg.getAct() != null && currentMsg.getAct() == "basepos") {
+			if (currentMsg.getAct() != null && currentMsg.getAct() == Constants.MSG_BASEPOS) {
 				baseAlive = true;
 				homeX = currentMsg.getFromX();
 				homeY = currentMsg.getFromY();
 				// setUserMessage(homeX + " ; " + homeY);
 				if (!sendAlive)
 				{
-					broadcast(groupName, "Home", "LauncherAlive");
+					broadcast(groupName, "Home", Constants.MSG_LAUNCHERALIVE);
 					sendAlive = true;
 				}
 			}
