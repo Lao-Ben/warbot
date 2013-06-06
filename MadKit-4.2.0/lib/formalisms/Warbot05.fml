@@ -149,6 +149,16 @@
 		<property name="displaylabel">false</property>
       </graphic-element>
     </node-desc>
+	
+	<node-desc name="Sword" class="warbot.kernel.Sword" category="objects">
+      <icon url="images/world/sword.jpg"/>
+      <property name="radius">1</property>
+	  <property name="energy">100</property>
+      <graphic-element class="warbot.kernel.GEntity">
+		<property name="imageaddress">images/world/sword.jpg</property>
+		<property name="displaylabel">false</property>
+      </graphic-element>
+    </node-desc>
 
        <node-desc name="privatMissileLauncher" class="warbot.kernel.RocketLauncher" category="Privat">
       <icon url="images/warbot/cyanrocketlauncher.gif"/>

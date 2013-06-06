@@ -23,6 +23,9 @@ public class CMHome extends Brain
 	HashMap<AgentAddress, Integer> lastCollectors;
 	final static int stepsBeforeReply 		= 4;
 	final static int stepsToKeepCollectors 	= 6;
+	int nbExplorer							= 0;
+	int nbLauncher							= 0;
+	int nbHitter							= 0;
 	
 	public CMHome(){
 		rcvFoodList		= new HashMap<String, Point2D>();
@@ -188,9 +191,6 @@ public class CMHome extends Brain
 		int distanceSecurite 			= 150;		// périmètre de sécurité
 		int nbEnnemisProches 			= 0;
 		int nbAmisProches 				= 0;
-		int nbExplorer					= 0;
-		int nbLauncher					= 0;
-		int nbHitter					= 0;
 		
 		String actMessageAideL 			= "HELP-BL";// cas où risque d'attaque ennemie des launchers
 		String actMessageAideE 			= "HELP-BE";// cas où risque d'attaque ennemie car explorers rôdent
@@ -208,13 +208,18 @@ public class CMHome extends Brain
 		{
 			if(currentMsg.getAct() != null)
 			{
-				if(currentMsg.getAct() == "ExplorerAlive") {
+				if(currentMsg.getAct() == "ExplorerAlive")
 					nbExplorer++;
-				} else if(currentMsg.getAct() == "LauncherAlive") {
+				else if(currentMsg.getAct() == "LauncherAlive")
 					nbLauncher++;
-				} 
 				else if(currentMsg.getAct() == "HitterAlive")
 					nbHitter++;
+				else if(currentMsg.getAct() == "ExplorerDead")
+					nbExplorer--;
+				else if(currentMsg.getAct() == "HitterDead")
+					nbHitter--;
+				else if(currentMsg.getAct() == "LauncherDead")
+					nbLauncher--;
 				else if (currentMsg.getAct() == Constants.MSG_FOODFOUND) {
 					// add food to the LinkedHashMap
 					storeFood(currentMsg.getArgN(3),

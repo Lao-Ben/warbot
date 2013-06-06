@@ -18,6 +18,8 @@ public class CMRocketLauncher extends Brain {
 
 	final int maxStep = 8;
 	int step = 0;
+	
+	boolean sendAlive = false;
 
 	public CMRocketLauncher() {
 	}
@@ -80,6 +82,12 @@ public class CMRocketLauncher extends Brain {
 		launchRocket(directionTir);
 	}
 
+	public void end()
+	{
+	    broadcast(groupName, "Home", "LauncherDead");
+	    println("ID Dead (me-launcher) : "+getAddress().getLocalID());
+	}
+	
 	public void doIt() {
 		// variables pour gestion des messages
 		double[][] tabAtaq = new double[4][100]; // tableau des message
@@ -259,7 +267,11 @@ public class CMRocketLauncher extends Brain {
 				homeX = currentMsg.getFromX();
 				homeY = currentMsg.getFromY();
 				// setUserMessage(homeX + " ; " + homeY);
-				broadcast(groupName, "Home", "LauncherAlive");
+				if (!sendAlive)
+				{
+					broadcast(groupName, "Home", "LauncherAlive");
+					sendAlive = true;
+				}
 			}
 		}
 		tailleAtaq = comptAtaq;

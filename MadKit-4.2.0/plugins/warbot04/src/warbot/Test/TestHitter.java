@@ -20,6 +20,7 @@ public class TestHitter extends Brain{
 
 	final int maxStep = 8;
 	int step = 0;
+	boolean sendAlive = false;
 
 	public TestHitter() {
 	}
@@ -31,6 +32,12 @@ public class TestHitter extends Brain{
 		createGroup(false, groupName, null, null);
 		requestRole(groupName, roleName, null);
 		requestRole(groupName, "mobile", null);
+	}
+	
+	public void end()
+	{
+	    broadcast(groupName, "Home", "HitterDead");
+	    println("ID Dead (me-hitter) : "+getAddress().getLocalID());
 	}
 
 	public void desobstination() {
@@ -241,8 +248,11 @@ public class TestHitter extends Brain{
 				baseAlive = true;
 				homeX = currentMsg.getFromX();
 				homeY = currentMsg.getFromY();
-				// setUserMessage(homeX + " ; " + homeY);
-				broadcast(groupName, "Home", "HitterAlive");
+				if (!sendAlive)
+				{
+					broadcast(groupName, "Home", "HitterAlive");
+					sendAlive = true;
+				}
 			}
 		}
 		tailleAtaq = comptAtaq;

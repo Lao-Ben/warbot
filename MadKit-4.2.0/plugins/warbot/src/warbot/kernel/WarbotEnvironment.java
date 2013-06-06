@@ -313,6 +313,26 @@ Entity authorizeMove(Rocket theRocket,double newX,double newY)
 	return null;
 }
 
+Entity authorizeMove(Sword theSword,double newX,double newY)
+{
+	Entity[] allEntities = world.getAllEntities();
+
+	//test if impact
+	double radius=theSword.getRadius();
+	for (int i=0;i<allEntities.length;i++)
+	{
+		double eradius = allEntities[i].getRadius();
+		double ex = allEntities[i].getX();
+		double ey = allEntities[i].getY();
+		if(allEntities[i] != theSword && (! (Math.abs(ex-newX) > radius+eradius || Math.abs(ey-newY) > radius+eradius || Math.sqrt( Math.pow(ex-newX,2)+ Math.pow(newY-ey,2) ) > radius+eradius)) )
+		{
+			//System.err.println("unauthorize move of rocket "+theRocket+ " with "+allEntities[i]);
+			return allEntities[i];
+		}
+	}
+	return null;
+}
+
 /*Entity[] getPerception(Entity robot)
 {
 	Collection detected = new HashSet();
