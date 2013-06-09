@@ -90,18 +90,18 @@ public class CMRocketLauncher extends Brain {
 		if (leaderPosition.getX() == -42)
 			return;
 				
-		int decal = 45;
+		int decal = 50;
 		if (role == RocketLauncherRole.squad_right)
 		{
 			decal = -decal;
 		}
-    	double[] pt = {leaderPosition.getX() + 60, leaderPosition.getY()};
-		AffineTransform.getRotateInstance(leaderHeading,
+    	double[] pt = {leaderPosition.getX() - 30, leaderPosition.getY() - decal};
+		AffineTransform.getRotateInstance(Math.toRadians(leaderHeading),
 										  leaderPosition.getX(),
 										  leaderPosition.getY())
 										  	.transform(pt, 0, pt, 0, 1);
 		setHeading(towards(pt[0], pt[1]));
-		setUserMessage((decal == 45) ? "sqad_left" : "squad_right");
+		setUserMessage((decal == 50) ? "sqad_left" : "squad_right");
 	}
 
 
