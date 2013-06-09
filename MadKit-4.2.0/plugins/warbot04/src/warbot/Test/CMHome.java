@@ -226,7 +226,7 @@ public class CMHome extends Brain
 			}
 		}
 
-		println("Home Handling BEGIN");
+//		println("Home Handling BEGIN");
 
 		letExplorersHandleFood(currentCollectors);
 //		println("Home Handling STEP1");

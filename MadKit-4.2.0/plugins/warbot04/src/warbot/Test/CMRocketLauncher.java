@@ -1,11 +1,13 @@
 package warbot.Test;
 
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.HashMap;
 import java.util.Random;
 
 import madkit.kernel.AgentAddress;
 
+import warbot.Test.Constants;
 import warbot.kernel.*;
 
 public class CMRocketLauncher extends Brain {
@@ -18,6 +20,8 @@ public class CMRocketLauncher extends Brain {
 
 	final static int maxStep = 8;
 	int step = 0;
+	
+	int treshold;
 	
 	//boolean sendAlive = false;
 
@@ -32,7 +36,7 @@ public class CMRocketLauncher extends Brain {
 	private HashMap<String, AgentAddress> squadMembers;
 	private Point2D leaderPosition;
 	private Double leaderHeading = 0.;
-	private Boolean wantingToBeALeader = false;
+	private int wantingToBeALeader = 0;
 	
 	private RocketLauncherRole role;
 
@@ -49,6 +53,7 @@ public class CMRocketLauncher extends Brain {
 		requestRole(groupName, "mobile", null);
 		role = RocketLauncherRole.alone;
 		leaderPosition = new Point2D.Double(-42, -42);
+		treshold = new Random().nextInt(62)-62;
 	}
 
 	public void desobstination() {
@@ -82,16 +87,21 @@ public class CMRocketLauncher extends Brain {
 	 * - the squad_left will stay at the left of the leader
 	 */
 	private void followTheLeader() {
-		println("MOVEEEEEEEE leader position : " + leaderPosition);
 		if (leaderPosition.getX() == -42)
 			return;
-		if (role == RocketLauncherRole.squad_left) {
-			setHeading(towards(leaderPosition.getX() - 60, leaderPosition.getY() - 40));
-			println(this.getName() + " -- squad_left moving to " + (leaderPosition.getX() - 60) + "," + (leaderPosition.getY() - 40));
-		} else if (role == RocketLauncherRole.squad_right) {
-			setHeading(towards(leaderPosition.getX() - 60, leaderPosition.getY() + 40));
-			println(this.getName() + " -- squad_right moving to " + (leaderPosition.getX() - 60) + "," + (leaderPosition.getY() + 40));
+				
+		int decal = 45;
+		if (role == RocketLauncherRole.squad_right)
+		{
+			decal = -decal;
 		}
+    	double[] pt = {leaderPosition.getX() + 60, leaderPosition.getY()};
+		AffineTransform.getRotateInstance(leaderHeading,
+										  leaderPosition.getX(),
+										  leaderPosition.getY())
+										  	.transform(pt, 0, pt, 0, 1);
+		setHeading(towards(pt[0], pt[1]));
+		setUserMessage((decal == 45) ? "sqad_left" : "squad_right");
 	}
 
 
@@ -240,6 +250,56 @@ public class CMRocketLauncher extends Brain {
 
 		println("ROLE ::::: " + role);
 
+		
+		// send messages to form a squad
+		if (role == RocketLauncherRole.alone) {
+			if (!squadMembers.isEmpty() && squadMembers.get("leader") == null)
+				squadMembers.clear();
+			
+			if (squadMembers.isEmpty()) {
+				int rand = new Random().nextInt(100);
+				//int rand = new Random().nextInt() % 3;
+
+				if (rand < treshold) {
+					if (tmpSquadMember == null)
+					{
+						broadcast(groupName, roleName, Constants.MSG_WANTTOBEALEADER);
+						wantingToBeALeader = 3;
+						println(this.getName() + " -- broadcast msg : " + Constants.MSG_WANTTOBEALEADER);
+					}
+				} else if (rand % 2 == 0) {
+					broadcast(groupName, roleName, Constants.MSG_WANTTOBEALEFT);
+					wantingToBeALeader = 0;
+					println(this.getName() + " -- broadcast msg : " + Constants.MSG_WANTTOBEALEFT);
+				} else {
+					broadcast(groupName, roleName, Constants.MSG_WANTTOBEARIGHT);				
+					wantingToBeALeader = 0;
+					println(this.getName() + " -- broadcast msg : " + Constants.MSG_WANTTOBEARIGHT);
+				}		
+			} else {
+				int rand = new Random().nextInt() % 2;
+				switch (rand) {
+				case 0:
+					send(squadMembers.get("leader"), Constants.MSG_WANTTOBEALEFT);
+					wantingToBeALeader = 0;
+					println(this.getName() + " -- broadcast msg2 : " + Constants.MSG_WANTTOBEALEFT + " to " + squadMembers.get("leader"));
+					break;
+				case 1:
+					send(squadMembers.get("leader"), Constants.MSG_WANTTOBEARIGHT);
+					wantingToBeALeader = 0;
+					println(this.getName() + " -- broadcast msg2 : " + Constants.MSG_WANTTOBEARIGHT+ " to " + squadMembers.get("leader"));
+					break;
+				}
+			}
+			treshold++;
+		}
+
+		
+		
+		
+		
+		
+		
 		// récupération et classement des messages
 		while ((currentMsg = readMessage()) != null && currentMsg.getSender() != getAddress()) {
 
@@ -323,7 +383,7 @@ public class CMRocketLauncher extends Brain {
 				// squad messages handling
 				if (role == RocketLauncherRole.alone) {
 					if (currentMsg.getAct() == Constants.MSG_WANTTOBEALEADER) {
-						if (!wantingToBeALeader && tmpSquadMember == null && squadMembers.isEmpty()) {
+						if (wantingToBeALeader == 0 && tmpSquadMember == null && squadMembers.isEmpty()) {
 							send(currentMsg.getSender(), Constants.MSG_ACCEPTLEADER);
 							tmpSquadMember = currentMsg.getSender();
 							println(this.getName() + " -- send msg : " + Constants.MSG_ACCEPTLEADER);
@@ -355,7 +415,7 @@ public class CMRocketLauncher extends Brain {
 
 					if (currentMsg.getAct() == Constants.MSG_ASKPOSITION) {
 						send(currentMsg.getSender(), Constants.MSG_SENDPOSITION, String.valueOf(getHeading()));
-						println("send msg : " + Constants.MSG_SENDPOSITION);
+						//println("send msg : " + Constants.MSG_SENDPOSITION);
 					}
 
 					if (currentMsg.getAct() == Constants.MSG_WANTTOBEALEFT) {
@@ -387,7 +447,7 @@ public class CMRocketLauncher extends Brain {
 			} else if (currentMsg != null && currentMsg.getAct() == Constants.MSG_SENDPOSITION) {
 				leaderPosition.setLocation(currentMsg.getFromX(), currentMsg.getFromY());
 				leaderHeading = Double.parseDouble(currentMsg.getArg1());
-				println(this.getName() + " -- receive msg : " + Constants.MSG_SENDPOSITION);
+				//println(this.getName() + " -- receive msg : " + Constants.MSG_SENDPOSITION);
 			}
 		}
 		tailleAtaq = comptAtaq;
@@ -402,50 +462,21 @@ public class CMRocketLauncher extends Brain {
 		comptHelpL = 0;
 		// fin récupération et classement des messages
 		
-		// send messages to form a squad
-		if (role == RocketLauncherRole.alone) {
-			if (squadMembers.isEmpty()) {
-				int rand = new Random().nextInt() % 3;
-				switch (rand) {
-				case 0:
-					broadcast(groupName, roleName, Constants.MSG_WANTTOBEALEADER);
-					wantingToBeALeader = true;
-					println(this.getName() + " -- broadcast msg : " + Constants.MSG_WANTTOBEALEADER);
-					break;
-				case 1:
-					broadcast(groupName, roleName, Constants.MSG_WANTTOBEALEFT);
-					wantingToBeALeader = false;
-					println(this.getName() + " -- broadcast msg : " + Constants.MSG_WANTTOBEALEFT);
-					break;
-				default:
-					broadcast(groupName, roleName, Constants.MSG_WANTTOBEARIGHT);				
-					wantingToBeALeader = false;
-					println(this.getName() + " -- broadcast msg : " + Constants.MSG_WANTTOBEARIGHT);
-					break;
-				}		
-			} else {
-				int rand = new Random().nextInt() % 2;
-				switch (rand) {
-				case 0:
-					send(squadMembers.get("leader"), Constants.MSG_WANTTOBEALEFT);
-					wantingToBeALeader = true;
-					println(this.getName() + " -- broadcast msg2 : " + Constants.MSG_WANTTOBEALEFT + " to " + squadMembers.get("leader"));
-					break;
-				case 1:
-					send(squadMembers.get("leader"), Constants.MSG_WANTTOBEARIGHT);
-					wantingToBeALeader = false;
-					println(this.getName() + " -- broadcast msg2 : " + Constants.MSG_WANTTOBEARIGHT+ " to " + squadMembers.get("leader"));
-					break;
-				}
-			}
-		}
+		
+		
+		
 
 		// send messages to get leader's position
 		if (squadMembers.get("leader") != null) {
 			send(squadMembers.get("leader"), Constants.MSG_ASKPOSITION);
-			println(this.getName() + " -- send msg : " + Constants.MSG_ASKPOSITION);
+			//println(this.getName() + " -- send msg : " + Constants.MSG_ASKPOSITION);
+		} else if (wantingToBeALeader > 0)
+			wantingToBeALeader--;
+		else if (role == RocketLauncherRole.alone) {
+			tmpSquadMember = null;
 		}
-
+		
+		
 
 		// récupération et classement des objets perçus
 		Percept[] percepts = getPercepts(); // entities in the perception radius
