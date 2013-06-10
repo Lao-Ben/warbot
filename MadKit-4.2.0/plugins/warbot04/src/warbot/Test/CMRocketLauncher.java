@@ -4,11 +4,13 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.ArrayList;
 
 import madkit.kernel.AgentAddress;
 
 import warbot.Test.Constants;
 import warbot.kernel.*;
+
 
 public class CMRocketLauncher extends Brain {
 	private String groupName = "warbot-";
@@ -18,6 +20,8 @@ public class CMRocketLauncher extends Brain {
 	private double homeX = 0;
 	private double homeY = 0;
 
+	private Point2D lastCenter = null;
+	
 	final static int maxStep = 8;
 	int step = 0;
 	
@@ -53,7 +57,7 @@ public class CMRocketLauncher extends Brain {
 		requestRole(groupName, "mobile", null);
 		role = RocketLauncherRole.alone;
 		leaderPosition = new Point2D.Double(-42, -42);
-		treshold = new Random().nextInt(62)-62;
+		treshold = new Random().nextInt(100)-100;
 	}
 
 	public void desobstination() {
@@ -80,6 +84,75 @@ public class CMRocketLauncher extends Brain {
 			step = maxStep;
 		}
 	}
+	
+	private void avoidance(Percept[] percepts) {
+		
+		ArrayList<Percept> uncrossables = new ArrayList<Percept>();
+
+		for (int i = 0; i < percepts.length; i++) {
+			Percept currentPercept = percepts[i];
+			if (currentPercept.getPerceptType() == "Obstacle")
+			{
+				uncrossables.add(currentPercept);
+			}
+		}
+		
+		double centerX = 0.;
+		double centerY = 0.;
+		
+		for (int i = 0; i < uncrossables.size(); i++) {
+				centerX += uncrossables.get(i).getX();
+				centerY += uncrossables.get(i).getY();
+		}
+		
+		if (uncrossables.size() > 0) {
+			centerX /= uncrossables.size();
+			centerY /= uncrossables.size();
+
+			Point2D center = new Point2D.Double(centerX, centerY);
+			
+			
+			if (lastCenter == null || (Math.abs(lastCenter.getX()) > Math.abs(centerX) || Math.abs(lastCenter.getY()) > Math.abs(centerY)))
+			{
+				double angle = getAngle(center);
+				int n = 8;
+				double delta = getHeading() - angle;
+				
+				println("uncrossables : " + uncrossables.size() + "center : " + center);
+				println("heading : " + getHeading() + " angle : " + angle);
+				println("delta : " + delta);
+				
+				delta = (delta < 0) ? 360 + delta : delta;
+
+				println("delta : " + delta);
+				
+				if (delta < 45) {
+					println("<45");
+					setHeading(getHeading() + delta / (1 * n));
+				} else if (delta > 315) {
+					println(">315");
+					setHeading(getHeading() - delta / (1 * n));
+				} else if(delta < 90) {
+					println("<90");
+					setHeading(getHeading() + delta / (2 * n));
+				} else if (delta > 270) {
+					println(">270");
+					setHeading(getHeading() - delta / (2 * n));
+				} else if (delta < 180) {
+					println("<180");
+					setHeading(getHeading() + delta / (4 * n));
+				} else if (delta > 180) {
+					println(">180");
+					setHeading(getHeading() - delta / (4 * n));
+				} else {
+					println("else");
+					setHeading(getHeading() + delta / (8 * n));
+				}
+			}
+			lastCenter = center;
+		}
+	}
+	
 
 	/**
 	 * set the position of the RocketLauncher depending on his role:
@@ -249,7 +322,7 @@ public class CMRocketLauncher extends Brain {
 
 
 		println("ROLE ::::: " + role);
-
+		
 		
 		// send messages to form a squad
 		if (role == RocketLauncherRole.alone) {
@@ -292,12 +365,7 @@ public class CMRocketLauncher extends Brain {
 				}
 			}
 			treshold++;
-		}
-
-		
-		
-		
-		
+		}	
 		
 		
 		// récupération et classement des messages
@@ -798,15 +866,20 @@ public class CMRocketLauncher extends Brain {
 				return;
 			}
 		}
-		// Z : déplacement aléatoire
 		
 
+		if (role == RocketLauncherRole.alone || role == RocketLauncherRole.squad_leader)
+			avoidance(percepts);
+
+		
 		step = maxStep;
 		if (getRocketNumber() < 10)
 			buildRocket();
 		else {
+			// Z : déplacement aléatoire
 			if (!isMoving())
 				randomHeading();
+			// Follow the squad leader
 			else if (role == RocketLauncherRole.squad_left
 					|| role == RocketLauncherRole.squad_right) {
 				followTheLeader();
@@ -814,5 +887,28 @@ public class CMRocketLauncher extends Brain {
 			move();
 		}
 		return;
+	}
+	
+	/* Fetches angle relative to screen centre point
+	 * where 3 O'Clock is 0 and 12 O'Clock is 270 degrees
+	 * 
+	 * @param screenPoint
+	 * @return angle in degress from 0-360.
+	 */
+	public double getAngle(Point2D screenPoint)
+	{
+	    double dx = screenPoint.getX();
+	    // Minus to correct for coord re-mapping
+	    double dy = -(screenPoint.getY());
+
+	    double inRads = Math.atan2(dy,dx);
+
+	    // We need to map to coord system when 0 degree is at 3 O'clock, 270 at 12 O'clock
+	    if (inRads < 0)
+	        inRads = Math.abs(inRads);
+	    else
+	        inRads = 2*Math.PI - inRads;
+
+	    return Math.toDegrees(inRads);
 	}
 }
