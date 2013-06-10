@@ -38,6 +38,7 @@ public final class Constants {
 	public final static String MSG_HITTERDEAD		= "HitterAlive";
 	
 	public final static String MSG_BASEPOS			= "basepos";
+	public final static String MSG_LEADERBASEPOS	= "LEADERBASEPOS";
 	
 	public final static String MSG_WANTTOBEALEADER = "WANTTOBEALEADER";
 	public final static String MSG_WANTTOBEALEFT 	= "WANTTOBEALEFT";
