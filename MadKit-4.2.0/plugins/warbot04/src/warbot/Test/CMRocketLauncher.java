@@ -243,8 +243,8 @@ public class CMRocketLauncher extends Brain {
 		// récupération et classement des messages
 		while ((currentMsg = readMessage()) != null && currentMsg.getSender() != getAddress()) {
 
-			if (role == RocketLauncherRole.alone
-					|| role == RocketLauncherRole.squad_leader
+			if ((role == RocketLauncherRole.alone
+					|| role == RocketLauncherRole.squad_leader)
 					&& currentMsg.getAct() != null)
 			{
 				// message d'attaque de base ennemie : les coordonnées sont toujours
@@ -355,6 +355,7 @@ public class CMRocketLauncher extends Brain {
 
 					if (currentMsg.getAct() == Constants.MSG_ASKPOSITION) {
 						send(currentMsg.getSender(), Constants.MSG_SENDPOSITION, String.valueOf(getHeading()));
+						send(currentMsg.getSender(), Constants.MSG_LEADERBASEPOS, String.valueOf(homeX),String.valueOf(homeY));
 						println("send msg : " + Constants.MSG_SENDPOSITION);
 					}
 
@@ -384,10 +385,18 @@ public class CMRocketLauncher extends Brain {
 						tmpSquadMember = null;
 					}
 				}
-			} else if (currentMsg != null && currentMsg.getAct() == Constants.MSG_SENDPOSITION) {
+			} else 
+			{
+				if (currentMsg.getAct() != null && currentMsg.getAct() == Constants.MSG_SENDPOSITION) {
 				leaderPosition.setLocation(currentMsg.getFromX(), currentMsg.getFromY());
 				leaderHeading = Double.parseDouble(currentMsg.getArg1());
 				println(this.getName() + " -- receive msg : " + Constants.MSG_SENDPOSITION);
+				}
+				if (currentMsg.getAct() != null && currentMsg.getAct() == Constants.MSG_LEADERBASEPOS)
+				{
+					homeX = Double.valueOf(currentMsg.getArg1());
+					homeY = Double.valueOf(currentMsg.getArg2());
+				}
 			}
 		}
 		tailleAtaq = comptAtaq;
