@@ -11,7 +11,7 @@
             <property name="showenergylevel">true</property>
             <property name="y">117.0</property>
             <property name="x">115.0</property>
-            <property name="brainclass">warbot.Test.CMHome</property>
+            <property name="brainclass">warbot.Test.TestHome</property>
             <property name="showdetect">false</property>
             <property name="speed">2</property>
             <property name="showusermessage">false</property>
@@ -28,7 +28,7 @@
             <property name="showenergylevel">true</property>
             <property name="y">91.0</property>
             <property name="x">249.0</property>
-            <property name="brainclass">warbot.Test.CMExplorer</property>
+            <property name="brainclass">warbot.Test.TestExplorer</property>
             <property name="showdetect">false</property>
             <property name="speed">2</property>
             <property name="usermessage">0</property>
@@ -46,7 +46,7 @@
             <property name="showenergylevel">true</property>
             <property name="y">154.0</property>
             <property name="x">259.0</property>
-            <property name="brainclass">warbot.Test.CMExplorer</property>
+            <property name="brainclass">warbot.Test.TestExplorer</property>
             <property name="showdetect">false</property>
             <property name="speed">2</property>
             <property name="usermessage">0</property>
@@ -64,7 +64,7 @@
             <property name="showenergylevel">true</property>
             <property name="y">215.0</property>
             <property name="x">212.0</property>
-            <property name="brainclass">warbot.Test.CMExplorer</property>
+            <property name="brainclass">warbot.Test.TestExplorer</property>
             <property name="showdetect">false</property>
             <property name="speed">2</property>
             <property name="usermessage">0</property>
@@ -82,7 +82,7 @@
             <property name="showenergylevel">true</property>
             <property name="y">81.0</property>
             <property name="x">182.0</property>
-            <property name="brainclass">warbot.Test.CMRocketLauncher</property>
+            <property name="brainclass">warbot.Test.TestRocketLauncher</property>
             <property name="showdetect">false</property>
             <property name="speed">3</property>
             <property name="showusermessage">false</property>
@@ -99,7 +99,7 @@
             <property name="showenergylevel">true</property>
             <property name="y">150.0</property>
             <property name="x">185.0</property>
-            <property name="brainclass">warbot.Test.CMRocketLauncher</property>
+            <property name="brainclass">warbot.Test.TestRocketLauncher</property>
             <property name="showdetect">false</property>
             <property name="speed">3</property>
             <property name="showusermessage">false</property>
@@ -116,7 +116,7 @@
             <property name="showenergylevel">true</property>
             <property name="y">214.0</property>
             <property name="x">121.0</property>
-            <property name="brainclass">warbot.Test.CMRocketLauncher</property>
+            <property name="brainclass">warbot.Test.TestRocketLauncher</property>
             <property name="showdetect">false</property>
             <property name="speed">3</property>
             <property name="showusermessage">false</property>

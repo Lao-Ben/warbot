@@ -13,7 +13,7 @@ import warbot.kernel.*;
  * @author PeYoTlL
  *
  */
-public class CMHome extends Brain
+public class TestHome extends Brain
 {
 	String groupName="warbot-";
 	final static String roleName="Home";
@@ -27,7 +27,7 @@ public class CMHome extends Brain
 	int nbLauncher							= 0;
 	int nbHitter							= 0;
 	
-	public CMHome(){
+	public TestHome(){
 		rcvFoodList		= new HashMap<String, Point2D>();
 		sntFoodList 	= new HashMap<String, Integer>();
 		lastCollectors 	= new HashMap<AgentAddress, Integer>();

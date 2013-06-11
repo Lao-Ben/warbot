@@ -3,7 +3,7 @@ package warbot.Test;
 import warbot.kernel.*;
 
 
-public class CMExplorer extends Brain {
+public class TestExplorer extends Brain {
 
 	/**
 	 * if the explorer is less than FOOD_DIST_TO_HOME from a home, it doesn't
@@ -38,7 +38,7 @@ public class CMExplorer extends Brain {
 	
 	//boolean sendAlive = false;
 	
-	public CMExplorer() {
+	public TestExplorer() {
 	}
 
 	public void activate() {

@@ -8,7 +8,6 @@ import java.util.Random;
 
 import madkit.kernel.AgentAddress;
 
-import warbot.Test.CMRocketLauncher.RocketLauncherRole;
 import warbot.kernel.Brain;
 import warbot.kernel.Percept;
 import warbot.kernel.WarbotMessage;

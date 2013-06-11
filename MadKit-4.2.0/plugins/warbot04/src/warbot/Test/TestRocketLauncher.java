@@ -13,7 +13,7 @@ import warbot.Test.TestHitter.HitterRole;
 import warbot.kernel.*;
 
 
-public class CMRocketLauncher extends Brain {
+public class TestRocketLauncher extends Brain {
 	private String groupName = "warbot-";
 	private String roleName = "Launcher";
 
@@ -45,7 +45,7 @@ public class CMRocketLauncher extends Brain {
 	
 	private RocketLauncherRole role;
 
-	public CMRocketLauncher() {
+	public TestRocketLauncher() {
 		squadMembers = new HashMap<String, AgentAddress>();
 	}
 
