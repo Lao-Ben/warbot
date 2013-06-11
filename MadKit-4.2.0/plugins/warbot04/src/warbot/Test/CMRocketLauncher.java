@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import madkit.kernel.AgentAddress;
 
 import warbot.Test.Constants;
+import warbot.Test.TestHitter.HitterRole;
 import warbot.kernel.*;
 
 
@@ -284,6 +285,7 @@ public class CMRocketLauncher extends Brain {
 		// distance de la base ennemie ayant
 		// le moins d'énergie tout en étant
 		// la plus proche
+		double[] tabAttackLeader = new double[2];
 		int comptMyTeam = 0; // compteur du tableau tabMyTeam
 		int tailleMyTeam = 0; // taille finale du tableau tabMyTeam
 		// initialisation de l'énergie et de la distance dans les tableaux des
@@ -520,6 +522,11 @@ public class CMRocketLauncher extends Brain {
 					leaderHeading = Double.parseDouble(currentMsg.getArg1());
 					//println(this.getName() + " -- receive msg : " + Constants.MSG_SENDPOSITION);
 				}
+				if (currentMsg.getAct() != null && currentMsg.getAct() == Constants.MSG_ATTACKLEADER)
+				{
+					tabAttackLeader[0] = Double.valueOf(currentMsg.getArg1());
+					tabAttackLeader[1] = Double.valueOf(currentMsg.getArg2());
+				}
 				if (currentMsg.getAct() != null && currentMsg.getAct() == Constants.MSG_LEADERBASEPOS)
 				{
 					homeX = Double.valueOf(currentMsg.getArg1());
@@ -677,7 +684,7 @@ public class CMRocketLauncher extends Brain {
 		tailleMyTeam = comptMyTeam;
 		comptMyTeam = 0;
 		// fin récupération et classement des objets perçus
-
+		
 		// on ordonne les actions principalement en fonction des objets perçus
 		// et des messages reçus
 		if (tabRocket[2] != 0) {
@@ -724,6 +731,11 @@ public class CMRocketLauncher extends Brain {
 				// tire
 				gestionTir(towards(tabBase[0], tabBase[1]), tailleMyTeam,
 						tabMyTeam);
+				if (role == RocketLauncherRole.squad_leader)
+				{
+					send(squadMembers.get("left"),Constants.MSG_ATTACKLEADER,argMessageX, argMessageY);
+					send(squadMembers.get("right"),Constants.MSG_ATTACKLEADER,argMessageX, argMessageY);
+				}
 				// launchRocket(towards(tabBase[0],tabBase[1]));
 				return;
 			}
@@ -739,6 +751,11 @@ public class CMRocketLauncher extends Brain {
 			// tire
 			gestionTir(towards(tabLauncher[0], tabLauncher[1]), tailleMyTeam,
 					tabMyTeam);
+			if (role == RocketLauncherRole.squad_leader)
+			{
+				send(squadMembers.get("left"),Constants.MSG_ATTACKLEADER,argMessageX, argMessageY);
+				send(squadMembers.get("right"),Constants.MSG_ATTACKLEADER,argMessageX, argMessageY);
+			}
 			// launchRocket(towards(tabLauncher[0],tabLauncher[1]));
 			return;
 		}
@@ -825,9 +842,18 @@ public class CMRocketLauncher extends Brain {
 
 		// W : on a pour objet perçu un explorer
 		if (tabExplorer[2] != 0 && tabExplorer[3] != 0) {
+			argMessageX = Double.toString(tabExplorer[0]);
+			argMessageY = Double.toString(tabExplorer[1]);
+			setUserMessage("ATTACK");
 			// tire
-			gestionTir(towards(tabExplorer[0], tabExplorer[1]), tailleMyTeam,
+			gestionTir(towards(tabLauncher[0], tabLauncher[1]), tailleMyTeam,
 					tabMyTeam);
+			if (role == RocketLauncherRole.squad_leader)
+			{
+				send(squadMembers.get("left"),Constants.MSG_ATTACKLEADER,argMessageX, argMessageY);
+				send(squadMembers.get("right"),Constants.MSG_ATTACKLEADER,argMessageX, argMessageY);
+			}
+			
 			// launchRocket(towards(tabExplorer[0],tabExplorer[1]));
 			return;
 		}
@@ -848,6 +874,16 @@ public class CMRocketLauncher extends Brain {
 			setHeading(towards(directionX, directionY));
 			move();
 			return;
+		}
+		
+		if (tabAttackLeader[0] != 0 && tabAttackLeader[1] != 0 && (role == RocketLauncherRole.squad_left || role == RocketLauncherRole.squad_right))
+		{
+			// demande aide
+			argMessageX = Double.toString(tabAttackLeader[0]);
+			argMessageY = Double.toString(tabAttackLeader[1]);
+			// tire
+			gestionTir(towards(tabAttackLeader[0], tabAttackLeader[1]), tailleMyTeam,
+					tabMyTeam);
 		}
 
 		// Y : rejoindre ami perçu
