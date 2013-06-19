@@ -9,10 +9,11 @@ import java.util.ArrayList;
 import madkit.kernel.AgentAddress;
 
 import warbot.Test.Constants;
+import warbot.Test.TestHitter.HitterRole;
 import warbot.kernel.*;
 
 
-public class CMRocketLauncher extends Brain {
+public class TestRocketLauncher extends Brain {
 	private String groupName = "warbot-";
 	private String roleName = "Launcher";
 
@@ -44,7 +45,7 @@ public class CMRocketLauncher extends Brain {
 	
 	private RocketLauncherRole role;
 
-	public CMRocketLauncher() {
+	public TestRocketLauncher() {
 		squadMembers = new HashMap<String, AgentAddress>();
 	}
 
@@ -683,7 +684,7 @@ public class CMRocketLauncher extends Brain {
 		tailleMyTeam = comptMyTeam;
 		comptMyTeam = 0;
 		// fin récupération et classement des objets perçus
-
+		
 		// on ordonne les actions principalement en fonction des objets perçus
 		// et des messages reçus
 		if (tabRocket[2] != 0) {
@@ -872,6 +873,16 @@ public class CMRocketLauncher extends Brain {
 			setHeading(towards(directionX, directionY));
 			move();
 			return;
+		}
+		
+		if (tabAttackLeader[0] != 0 && tabAttackLeader[1] != 0 && (role == RocketLauncherRole.squad_left || role == RocketLauncherRole.squad_right))
+		{
+			// demande aide
+			argMessageX = Double.toString(tabAttackLeader[0]);
+			argMessageY = Double.toString(tabAttackLeader[1]);
+			// tire
+			gestionTir(towards(tabAttackLeader[0], tabAttackLeader[1]), tailleMyTeam,
+					tabMyTeam);
 		}
 
 		if (tabAttackLeader[0] != 0 && tabAttackLeader[1] != 0 && (role == RocketLauncherRole.squad_left || role == RocketLauncherRole.squad_right))

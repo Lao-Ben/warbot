@@ -1,8 +1,12 @@
 package warbot.Test;
 
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
+
+import madkit.kernel.AgentAddress;
 
 import warbot.kernel.Brain;
 import warbot.kernel.Percept;
@@ -25,8 +29,26 @@ public class TestHitter extends Brain{
 	final int maxStep = 8;
 	int step = 0;
 	//boolean sendAlive = false;
+	
+	int treshold;
+	
+	static enum HitterRole {
+		alone,
+		squad_leader,
+		squad_left,
+		squad_right
+	};
+
+	private AgentAddress tmpSquadMember = null;
+	private HashMap<String, AgentAddress> squadMembers;
+	private Point2D leaderPosition;
+	private Double leaderHeading = 0.;
+	private int wantingToBeALeader = 0;
+	
+	private HitterRole role;
 
 	public TestHitter() {
+		squadMembers = new HashMap<String, AgentAddress>();
 	}
 
 	public void activate() {
@@ -36,6 +58,9 @@ public class TestHitter extends Brain{
 		createGroup(false, groupName, null, null);
 		requestRole(groupName, roleName, null);
 		requestRole(groupName, "mobile", null);
+		role = HitterRole.alone;
+		leaderPosition = new Point2D.Double(-42, -42);
+		treshold = new Random().nextInt(100)-100;
 	}
 	
 	public void end()
@@ -160,7 +185,30 @@ public class TestHitter extends Brain{
 		println("pas desobstination");
 		Hit(directionTir);
 	}
-
+	
+	/**
+	 * set the position of the RocketLauncher depending on his role:
+	 * - the squad_left will stay at the left of the leader
+	 * - the squad_left will stay at the left of the leader
+	 */
+	private void followTheLeader() {
+		if (leaderPosition.getX() == -42)
+			return;
+				
+		int decal = 50;
+		if (role == HitterRole.squad_right)
+		{
+			decal = -decal;
+		}
+    	double[] pt = {leaderPosition.getX() - 30, leaderPosition.getY() - decal};
+		AffineTransform.getRotateInstance(Math.toRadians(leaderHeading),
+										  leaderPosition.getX(),
+										  leaderPosition.getY())
+										  	.transform(pt, 0, pt, 0, 1);
+		setHeading(towards(pt[0], pt[1]));
+		setUserMessage((decal == 50) ? "sqad_left" : "squad_right");
+	}
+	
 	public void doIt() {
 		// variables pour gestion des messages
 		double[][] tabAtaq = new double[4][100]; // tableau des message
@@ -237,6 +285,7 @@ public class TestHitter extends Brain{
 											// distance de la base ennemie ayant
 											// le moins d'énergie tout en étant
 											// la plus proche
+		double[] tabAttackLeader = new double[2];
 		int comptMyTeam = 0; // compteur du tableau tabMyTeam
 		int tailleMyTeam = 0; // taille finale du tableau tabMyTeam
 		// initialisation de l'énergie et de la distance dans les tableaux des
@@ -273,84 +322,217 @@ public class TestHitter extends Brain{
 										// "se sacrifier"
 		boolean baseAlive = false;
 		
+		// send messages to form a squad
+				if (role == HitterRole.alone) {
+					if (!squadMembers.isEmpty() && squadMembers.get("leader") == null)
+						squadMembers.clear();
+					
+					if (squadMembers.isEmpty()) {
+						int rand = new Random().nextInt(100);
+						//int rand = new Random().nextInt() % 3;
+
+						if (rand < treshold) {
+							if (tmpSquadMember == null)
+							{
+								broadcast(groupName, roleName, Constants.MSG_WANTTOBEALEADER);
+								wantingToBeALeader = 3;
+								println(this.getName() + " -- broadcast msg : " + Constants.MSG_WANTTOBEALEADER);
+							}
+						} else if (rand % 2 == 0) {
+							broadcast(groupName, roleName, Constants.MSG_WANTTOBEALEFT);
+							wantingToBeALeader = 0;
+							println(this.getName() + " -- broadcast msg : " + Constants.MSG_WANTTOBEALEFT);
+						} else {
+							broadcast(groupName, roleName, Constants.MSG_WANTTOBEARIGHT);				
+							wantingToBeALeader = 0;
+							println(this.getName() + " -- broadcast msg : " + Constants.MSG_WANTTOBEARIGHT);
+						}		
+					} else {
+						int rand = new Random().nextInt() % 2;
+						switch (rand) {
+						case 0:
+							send(squadMembers.get("leader"), Constants.MSG_WANTTOBEALEFT);
+							wantingToBeALeader = 0;
+							println(this.getName() + " -- broadcast msg2 : " + Constants.MSG_WANTTOBEALEFT + " to " + squadMembers.get("leader"));
+							break;
+						case 1:
+							send(squadMembers.get("leader"), Constants.MSG_WANTTOBEARIGHT);
+							wantingToBeALeader = 0;
+							println(this.getName() + " -- broadcast msg2 : " + Constants.MSG_WANTTOBEARIGHT+ " to " + squadMembers.get("leader"));
+							break;
+						}
+					}
+					treshold++;
+				}
 		
 		Percept EnnemyBase = null;
 		Percept EnnemyExplorer = null;
 		Percept EnnemyRocketLauncher = null;
 
 		// récupération et classement des messages
-		while ((currentMsg = readMessage()) != null) {
-			// message d'attaque de base ennemie : les coordonnées sont toujours
-			// présentes en argument du message
-			if (currentMsg.getAct() != null && currentMsg.getAct() == "ATAQ") {
-				tabAtaq[0][comptAtaq] = Double.valueOf(currentMsg.getArg1())
-						.doubleValue();
-				tabAtaq[1][comptAtaq] = Double.valueOf(currentMsg.getArg2())
-						.doubleValue();
-				tabAtaq[2][comptAtaq] = currentMsg.getFromX();
-				tabAtaq[3][comptAtaq] = currentMsg.getFromY();
-				comptAtaq++;
-			}
-			// message d'aide d'une base concernant les launchers : les
-			// coordonnées de l'ennemi sont toujours présentes en argument du
-			// message
-			if (currentMsg.getAct() != null && currentMsg.getAct() == "HELP-BL") {
-				tabHelpBL[0][comptHelpBL] = Double
-						.valueOf(currentMsg.getArg1()).doubleValue();
-				tabHelpBL[1][comptHelpBL] = Double
-						.valueOf(currentMsg.getArg2()).doubleValue();
-				tabHelpBL[2][comptHelpBL] = currentMsg.getFromX();
-				tabHelpBL[3][comptHelpBL] = currentMsg.getFromY();
-				comptHelpBL++;
-			}
-			// message d'aide d'une base concernant les explorers: les
-			// coordonnées de l'ennemi sont toujours présentes en argument du
-			// message
-			if (currentMsg.getAct() != null && currentMsg.getAct() == "HELP-BE") {
-				tabHelpBE[0][comptHelpBE] = Double
-						.valueOf(currentMsg.getArg1()).doubleValue();
-				tabHelpBE[1][comptHelpBE] = Double
-						.valueOf(currentMsg.getArg2()).doubleValue();
-				tabHelpBE[2][comptHelpBE] = currentMsg.getFromX();
-				tabHelpBE[3][comptHelpBE] = currentMsg.getFromY();
-				comptHelpBE++;
-			}
-			// message d'aide d'un launcher : les coordonnées de l'ennemi sont
-			// toujours présentes en argument du message
-			if (currentMsg.getAct() != null && currentMsg.getAct() == "HELP-L") {
-				// un launcher ne prend pas en compte ses propres messages
-				if (currentMsg.getFromX() != 0 && currentMsg.getFromY() != 0) {
-					tabHelpL[0][comptHelpL] = Double.valueOf(
-							currentMsg.getArg1()).doubleValue();
-					tabHelpL[1][comptHelpL] = Double.valueOf(
-							currentMsg.getArg2()).doubleValue();
-					tabHelpL[2][comptHelpL] = currentMsg.getFromX();
-					tabHelpL[3][comptHelpL] = currentMsg.getFromY();
-					comptHelpL++;
+				while ((currentMsg = readMessage()) != null && currentMsg.getSender() != getAddress()) {
+
+					if ((role == HitterRole.alone
+							|| role == HitterRole.squad_leader)
+							&& currentMsg.getAct() != null)
+					{
+						// message d'attaque de base ennemie : les coordonnées sont toujours
+						// présentes en argument du message
+						if (currentMsg.getAct() == "ATAQ") {
+							tabAtaq[0][comptAtaq] = Double.valueOf(currentMsg.getArg1())
+									.doubleValue();
+							tabAtaq[1][comptAtaq] = Double.valueOf(currentMsg.getArg2())
+									.doubleValue();
+							tabAtaq[2][comptAtaq] = currentMsg.getFromX();
+							tabAtaq[3][comptAtaq] = currentMsg.getFromY();
+							comptAtaq++;
+						}
+						// message d'aide d'une base concernant les launchers : les
+						// coordonnées de l'ennemi sont toujours présentes en argument du
+						// message
+						if (currentMsg.getAct() == "HELP-BL") {
+							tabHelpBL[0][comptHelpBL] = Double
+									.valueOf(currentMsg.getArg1()).doubleValue();
+							tabHelpBL[1][comptHelpBL] = Double
+									.valueOf(currentMsg.getArg2()).doubleValue();
+							tabHelpBL[2][comptHelpBL] = currentMsg.getFromX();
+							tabHelpBL[3][comptHelpBL] = currentMsg.getFromY();
+							comptHelpBL++;
+						}
+						// message d'aide d'une base concernant les explorers: les
+						// coordonnées de l'ennemi sont toujours présentes en argument du
+						// message
+						if (currentMsg.getAct() == "HELP-BE") {
+							tabHelpBE[0][comptHelpBE] = Double
+									.valueOf(currentMsg.getArg1()).doubleValue();
+							tabHelpBE[1][comptHelpBE] = Double
+									.valueOf(currentMsg.getArg2()).doubleValue();
+							tabHelpBE[2][comptHelpBE] = currentMsg.getFromX();
+							tabHelpBE[3][comptHelpBE] = currentMsg.getFromY();
+							comptHelpBE++;
+						}
+						// message d'aide d'un launcher : les coordonnées de l'ennemi sont
+						// toujours présentes en argument du message
+						if (currentMsg.getAct() == "HELP-L") {
+							// un launcher ne prend pas en compte ses propres messages
+							if (currentMsg.getFromX() != 0 && currentMsg.getFromY() != 0) {
+								tabHelpL[0][comptHelpL] = Double.valueOf(
+										currentMsg.getArg1()).doubleValue();
+								tabHelpL[1][comptHelpL] = Double.valueOf(
+										currentMsg.getArg2()).doubleValue();
+								tabHelpL[2][comptHelpL] = currentMsg.getFromX();
+								tabHelpL[3][comptHelpL] = currentMsg.getFromY();
+								comptHelpL++;
+							}
+						}
+						// message d'aide d'un explorer : pas de coordonnées de l'ennemi en
+						// argument si message suite à tir
+						if (currentMsg.getAct() == "HELP-E") {
+							tabHelpE[0][comptHelpE] = Double.valueOf(currentMsg.getArg1())
+									.doubleValue();
+							tabHelpE[1][comptHelpE] = Double.valueOf(currentMsg.getArg2())
+									.doubleValue();
+							tabHelpE[2][comptHelpE] = currentMsg.getFromX();
+							tabHelpE[3][comptHelpE] = currentMsg.getFromY();
+							comptHelpE++;
+						}
+						
+						if (currentMsg.getAct() == Constants.MSG_BASEPOS) {
+							baseAlive = true;
+							homeX = currentMsg.getFromX();
+							homeY = currentMsg.getFromY();
+							// setUserMessage(homeX + " ; " + homeY);
+							/*if (!sendAlive)
+							{
+								broadcast(groupName, "Home", Constants.MSG_LAUNCHERALIVE);
+								sendAlive = true;
+							}*/
+						}
+
+						// squad messages handling
+						if (role == HitterRole.alone) {
+							if (currentMsg.getAct() == Constants.MSG_WANTTOBEALEADER) {
+								if (wantingToBeALeader == 0 && tmpSquadMember == null && squadMembers.isEmpty()) {
+									send(currentMsg.getSender(), Constants.MSG_ACCEPTLEADER);
+									tmpSquadMember = currentMsg.getSender();
+									println(this.getName() + " -- send msg : " + Constants.MSG_ACCEPTLEADER);
+								}
+							} else if (currentMsg.getAct() == Constants.MSG_ACCEPTLEADER) {
+								send(currentMsg.getSender(), Constants.MSG_ACCEPTLEADERACK);
+								role = HitterRole.squad_leader;
+								println(this.getName() + " -- send msg : " + Constants.MSG_ACCEPTLEADERACK);
+								tmpSquadMember = null;
+								// propose a left or a right role or both
+							} else if (currentMsg.getAct() == Constants.MSG_ACCEPTLEADERACK) {
+								squadMembers.put("leader", tmpSquadMember);
+								tmpSquadMember = null;
+								println(this.getName() + " -- receive msg : " + Constants.MSG_ACCEPTLEADER);
+								// confirm a proposed role	
+							} else if (currentMsg.getAct() == Constants.MSG_ACCEPTLEFT) {
+								send(currentMsg.getSender(), Constants.MSG_ACCEPTLEFTACK);
+								squadMembers.put("leader", currentMsg.getSender());
+								role = HitterRole.squad_left;
+								tmpSquadMember = null;
+								println(this.getName() + " -- send msg : " + Constants.MSG_ACCEPTLEFTACK);
+							} else if (currentMsg.getAct() == Constants.MSG_ACCEPTRIGHT) {
+								send(currentMsg.getSender(), Constants.MSG_ACCEPTRIGHTACK);
+								squadMembers.put("leader", currentMsg.getSender());
+								role = HitterRole.squad_right;
+								tmpSquadMember = null;
+							}
+						} else if (role == HitterRole.squad_leader) {
+
+							if (currentMsg.getAct() == Constants.MSG_ASKPOSITION) {
+								send(currentMsg.getSender(), Constants.MSG_SENDPOSITION, String.valueOf(getHeading()));
+								send(currentMsg.getSender(), Constants.MSG_LEADERBASEPOS, String.valueOf(homeX),String.valueOf(homeY));
+								//println("send msg : " + Constants.MSG_SENDPOSITION);
+							}
+
+							if (currentMsg.getAct() == Constants.MSG_WANTTOBEALEFT) {
+								println("tmpSM2 " + tmpSquadMember
+										+ " sm get left " + squadMembers.get("left"));
+								if (squadMembers.get("left") == null
+										&& tmpSquadMember == null) {
+									send(currentMsg.getSender(), Constants.MSG_ACCEPTLEFT);
+									tmpSquadMember = currentMsg.getSender();
+									println(this.getName() + " -- send msg : " + Constants.MSG_ACCEPTLEFT);
+								}
+
+							} else if (currentMsg.getAct() == Constants.MSG_ACCEPTLEFTACK) {
+								squadMembers.put("left", tmpSquadMember);
+								tmpSquadMember = null;
+								println(this.getName() + " -- receive msg : " + Constants.MSG_ACCEPTLEFTACK);
+							} else if (currentMsg.getAct() == Constants.MSG_WANTTOBEARIGHT) {
+								if (squadMembers.get("right") == null
+										&& tmpSquadMember == null) {
+									send(currentMsg.getSender(), Constants.MSG_ACCEPTRIGHT);
+									tmpSquadMember = currentMsg.getSender();
+								}
+
+							} else if (currentMsg.getAct() == Constants.MSG_ACCEPTRIGHTACK) {
+								squadMembers.put("right", tmpSquadMember);
+								tmpSquadMember = null;
+							}
+						}
+					} else 
+					{
+						if (currentMsg.getAct() != null && currentMsg.getAct() == Constants.MSG_SENDPOSITION) {
+							leaderPosition.setLocation(currentMsg.getFromX(), currentMsg.getFromY());
+							leaderHeading = Double.parseDouble(currentMsg.getArg1());
+							//println(this.getName() + " -- receive msg : " + Constants.MSG_SENDPOSITION);
+						}
+						if (currentMsg.getAct() != null && currentMsg.getAct() == Constants.MSG_ATTACKLEADER)
+						{
+							tabAttackLeader[0] = Double.valueOf(currentMsg.getArg1());
+							tabAttackLeader[1] = Double.valueOf(currentMsg.getArg2());
+						}
+						if (currentMsg.getAct() != null && currentMsg.getAct() == Constants.MSG_LEADERBASEPOS)
+						{
+							homeX = Double.valueOf(currentMsg.getArg1());
+							homeY = Double.valueOf(currentMsg.getArg2());
+						}
+					}
 				}
-			}
-			// message d'aide d'un explorer : pas de coordonnées de l'ennemi en
-			// argument si message suite à tir
-			if (currentMsg.getAct() != null && currentMsg.getAct() == "HELP-E") {
-				tabHelpE[0][comptHelpE] = Double.valueOf(currentMsg.getArg1())
-						.doubleValue();
-				tabHelpE[1][comptHelpE] = Double.valueOf(currentMsg.getArg2())
-						.doubleValue();
-				tabHelpE[2][comptHelpE] = currentMsg.getFromX();
-				tabHelpE[3][comptHelpE] = currentMsg.getFromY();
-				comptHelpE++;
-			}
-			if (currentMsg.getAct() != null && currentMsg.getAct() == Constants.MSG_BASEPOS) {
-				baseAlive = true;
-				homeX = currentMsg.getFromX();
-				homeY = currentMsg.getFromY();
-				/*if (!sendAlive)
-				{
-					broadcast(groupName, "Home", Constants.MSG_HITTERALIVE);
-					sendAlive = true;
-				}*/
-			}
-		}
 		tailleAtaq = comptAtaq;
 		tailleHelpBL = comptHelpBL;
 		tailleHelpBE = comptHelpBE;
@@ -363,6 +545,16 @@ public class TestHitter extends Brain{
 		comptHelpL = 0;
 		// fin récupération et classement des messages
 
+		// send messages to get leader's position
+				if (squadMembers.get("leader") != null) {
+					send(squadMembers.get("leader"), Constants.MSG_ASKPOSITION);
+					//println(this.getName() + " -- send msg : " + Constants.MSG_ASKPOSITION);
+				} else if (wantingToBeALeader > 0)
+					wantingToBeALeader--;
+				else if (role == HitterRole.alone) {
+					tmpSquadMember = null;
+				}
+		
 		// récupération et classement des objets perçus
 		Percept[] percepts = getPercepts(); // entities in the perception radius
 
@@ -540,7 +732,13 @@ public class TestHitter extends Brain{
 				if ((!getShot()) || (getShot() && tabBase[2] < seuilEnergieBase)) {
 					setUserMessage("ATTACK");
 					// tire
-					gestionHit(towards(tabBase[0], tabBase[1]), tailleMyTeam, tabMyTeam);
+					gestionHit(towards(tabBase[0], tabBase[1]), tailleMyTeam,
+							tabMyTeam);
+					if (role == HitterRole.squad_leader)
+					{
+						send(squadMembers.get("left"),Constants.MSG_ATTACKLEADER,argMessageX, argMessageY);
+						send(squadMembers.get("right"),Constants.MSG_ATTACKLEADER,argMessageX, argMessageY);
+					}
 					// launchRocket(towards(tabBase[0],tabBase[1]));
 					return;
 				}
@@ -565,7 +763,13 @@ public class TestHitter extends Brain{
 						argMessageY);
 				setUserMessage("ATTACK");
 				// tire
-				gestionHit(towards(tabLauncher[0], tabLauncher[1]), tailleMyTeam, tabMyTeam);
+				gestionHit(towards(tabLauncher[0], tabLauncher[1]), tailleMyTeam,
+						tabMyTeam);
+				if (role == HitterRole.squad_leader)
+				{
+					send(squadMembers.get("left"),Constants.MSG_ATTACKLEADER,argMessageX, argMessageY);
+					send(squadMembers.get("right"),Constants.MSG_ATTACKLEADER,argMessageX, argMessageY);
+				}
 				// launchRocket(towards(tabLauncher[0],tabLauncher[1]));
 				return;
 			}
@@ -659,12 +863,20 @@ public class TestHitter extends Brain{
 
 		// W : on a pour objet perçu un explorer
 		if (tabExplorer[2] != 0 && tabExplorer[3] != 0) {
+			argMessageX = Double.toString(tabExplorer[0]);
+			argMessageY = Double.toString(tabExplorer[1]);
 			setUserMessage(""+distanceTo(EnnemyExplorer));
 			if (distanceTo(EnnemyExplorer) < 10)
 			{
 				setUserMessage("ATTACK");
 				// tire
-				gestionHit(towards(tabExplorer[0], tabExplorer[1]), tailleMyTeam, tabMyTeam);
+				gestionHit(towards(tabExplorer[0], tabExplorer[1]), tailleMyTeam,
+						tabMyTeam);
+				if (role == HitterRole.squad_leader)
+				{
+					send(squadMembers.get("left"),Constants.MSG_ATTACKLEADER,argMessageX, argMessageY);
+					send(squadMembers.get("right"),Constants.MSG_ATTACKLEADER,argMessageX, argMessageY);
+				}
 				// launchRocket(towards(tabExplorer[0],tabExplorer[1]));
 				return;
 			}
@@ -692,6 +904,16 @@ public class TestHitter extends Brain{
 			setHeading(towards(directionX, directionY));
 			move();
 			return;
+		}
+		
+		if (tabAttackLeader[0] != 0 && tabAttackLeader[1] != 0 && (role == HitterRole.squad_left || role == HitterRole.squad_right))
+		{
+			// demande aide
+			argMessageX = Double.toString(tabAttackLeader[0]);
+			argMessageY = Double.toString(tabAttackLeader[1]);
+			// tire
+			gestionHit(towards(tabAttackLeader[0], tabAttackLeader[1]), tailleMyTeam,
+					tabMyTeam);
 		}
 
 		// Y : rejoindre ami perçu
@@ -721,16 +943,20 @@ public class TestHitter extends Brain{
 		}
 		
 		avoidance(percepts);
+		if (role == HitterRole.alone || role == HitterRole.squad_leader)
+			avoidance(percepts);
 		
 		// Z : déplacement aléatoire
 		step = maxStep;
-		if (getRocketNumber() < 10)
-			buildRocket();
-		else {
-			if (!isMoving())
-				randomHeading();
-			move();
+		// Z : déplacement aléatoire
+		if (!isMoving())
+			randomHeading();
+		// Follow the squad leader
+		else if (role == HitterRole.squad_left
+				|| role == HitterRole.squad_right) {
+			followTheLeader();
 		}
+		move();
 		return;
 	}
 	

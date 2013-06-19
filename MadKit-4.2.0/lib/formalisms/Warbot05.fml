@@ -920,7 +920,7 @@
 	  <property name="team">Test</property>
       <property name="detectingrange">80</property>
 	  <property name="energy">4000</property>
-	  <property name="brainClass">warbot.Test.CMRocketLauncher</property>
+	  <property name="brainClass">warbot.Test.TestRocketLauncher</property>
 	  <graphic-element class="warbot.kernel.GBasicBody">
 		<property name="imageaddress">images/warbot/Test/rocket.png</property>
 		<property name="labelLocation">4</property>
@@ -946,7 +946,7 @@
 	  <property name="team">Test</property>
       <property name="detectingrange">130</property>
 	  <property name="energy">1000</property>
-	  <property name="brainClass">warbot.Test.CMExplorer</property>
+	  <property name="brainClass">warbot.Test.TestExplorer</property>
       <graphic-element class="warbot.kernel.GBasicBody">
 		<property name="imageaddress">images/warbot/Test/explorer.png</property>
 		<property name="labelLocation">4</property>
@@ -959,7 +959,7 @@
       <property name="radius">20</property>
       <property name="detectingrange">200</property>
 	  <property name="energy">12000</property>
-	  <property name="brainClass">warbot.Test.CMHome</property>
+	  <property name="brainClass">warbot.Test.TestHome</property>
       <graphic-element class="warbot.kernel.GBasicBody">
 		<property name="imageaddress">images/warbot/Test/base.png</property>
 		<property name="displaylabel">false</property>
