@@ -55,4 +55,5 @@ public final class Constants {
 	public final static String MSG_ASKPOSITION 	= "ASKPOSITION";
 	public final static String MSG_SENDPOSITION	= "SENDPOSITION";
 
+	public final static String MSG_ATTACKLEADER  = "ATTACKLEADER";
 }

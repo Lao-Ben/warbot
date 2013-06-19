@@ -1,5 +1,7 @@
 package warbot.Test;
 
+import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.Random;
 
 import warbot.kernel.Brain;
@@ -14,6 +16,8 @@ public class TestHitter extends Brain{
 	int temps = tempsMax; // variable permettant de garder la meme direction
 							// pendant tempsMax itérations
 
+	private Point2D lastCenter = null;
+	
 	Percept myhome = null;
 	double homeX = 0;
 	double homeY = 0;
@@ -63,6 +67,98 @@ public class TestHitter extends Brain{
 		{
 			temps = tempsMax;
 		}
+	}
+	
+	private void avoidance(Percept[] percepts) {
+
+		ArrayList<Percept> uncrossables = new ArrayList<Percept>();
+
+		for (int i = 0; i < percepts.length; i++) {
+			Percept currentPercept = percepts[i];
+			if (currentPercept.getPerceptType() == "Obstacle")
+			{
+				uncrossables.add(currentPercept);
+			}
+		}
+		
+		double centerX = 0.;
+		double centerY = 0.;
+		
+		for (int i = 0; i < uncrossables.size(); i++) {
+				centerX += uncrossables.get(i).getX();
+				centerY += uncrossables.get(i).getY();
+		}
+		
+		if (uncrossables.size() > 0) {
+			centerX /= uncrossables.size();
+			centerY /= uncrossables.size();
+
+			Point2D center = new Point2D.Double(centerX, centerY);
+			
+			
+			if (lastCenter == null || (Math.abs(lastCenter.getX()) > Math.abs(centerX) || Math.abs(lastCenter.getY()) > Math.abs(centerY)))
+			{
+				double angle = getAngle(center);
+				int n = 8;
+				double delta = getHeading() - angle;
+				
+				println("uncrossables : " + uncrossables.size() + "center : " + center);
+				println("heading : " + getHeading() + " angle : " + angle);
+				println("delta : " + delta);
+				
+				delta = (delta < 0) ? 360 + delta : delta;
+
+				println("delta : " + delta);
+				
+				if (delta < 45) {
+					println("<45");
+					setHeading(getHeading() + delta / (1 * n));
+				} else if (delta > 315) {
+					println(">315");
+					setHeading(getHeading() - delta / (1 * n));
+				} else if(delta < 90) {
+					println("<90");
+					setHeading(getHeading() + delta / (2 * n));
+				} else if (delta > 270) {
+					println(">270");
+					setHeading(getHeading() - delta / (2 * n));
+				} else if (delta < 180) {
+					println("<180");
+					setHeading(getHeading() + delta / (4 * n));
+				} else if (delta > 180) {
+					println(">180");
+					setHeading(getHeading() - delta / (4 * n));
+				} else {
+					println("else");
+					setHeading(getHeading() + delta / (8 * n));
+				}
+			}
+			lastCenter = center;
+		}
+	}
+	
+	public void gestionHit(double directionTir, int tailleTabAmis,
+			double[][] tabAmis) // to avoid hit on its friends
+	{
+		println("gestion du tir");
+		println("direction du tir :" + Double.toString(directionTir));
+		for (int i = 0; i < tailleTabAmis; i++) {
+			println("entrée dans le tableau");
+			println("direction de l'ami : "
+					+ Double.toString(towards(tabAmis[0][i], tabAmis[1][i])));
+			if ((directionTir - towards(tabAmis[0][i], tabAmis[1][i]) > 0 && directionTir
+					- towards(tabAmis[0][i], tabAmis[1][i]) < 20)
+					|| (towards(tabAmis[0][i], tabAmis[1][i]) - directionTir > 0 && towards(
+							tabAmis[0][i], tabAmis[1][i]) - directionTir < 20)
+							|| (directionTir - towards(tabAmis[0][i], tabAmis[1][i]) > 340)
+							|| (towards(tabAmis[0][i], tabAmis[1][i]) - directionTir > 340)) {
+				println("desobstination");
+				desobstination();
+				return;
+			}
+		}
+		println("pas desobstination");
+		Hit(directionTir);
 	}
 
 	public void doIt() {
@@ -444,7 +540,7 @@ public class TestHitter extends Brain{
 				if ((!getShot()) || (getShot() && tabBase[2] < seuilEnergieBase)) {
 					setUserMessage("ATTACK");
 					// tire
-					Hit(towards(tabBase[0], tabBase[1]));
+					gestionHit(towards(tabBase[0], tabBase[1]), tailleMyTeam, tabMyTeam);
 					// launchRocket(towards(tabBase[0],tabBase[1]));
 					return;
 				}
@@ -469,7 +565,7 @@ public class TestHitter extends Brain{
 						argMessageY);
 				setUserMessage("ATTACK");
 				// tire
-				Hit(towards(tabLauncher[0], tabLauncher[1]));
+				gestionHit(towards(tabLauncher[0], tabLauncher[1]), tailleMyTeam, tabMyTeam);
 				// launchRocket(towards(tabLauncher[0],tabLauncher[1]));
 				return;
 			}
@@ -568,7 +664,7 @@ public class TestHitter extends Brain{
 			{
 				setUserMessage("ATTACK");
 				// tire
-				Hit(towards(tabExplorer[0], tabExplorer[1]));
+				gestionHit(towards(tabExplorer[0], tabExplorer[1]), tailleMyTeam, tabMyTeam);
 				// launchRocket(towards(tabExplorer[0],tabExplorer[1]));
 				return;
 			}
@@ -623,6 +719,9 @@ public class TestHitter extends Brain{
 				return;
 			}
 		}
+		
+		avoidance(percepts);
+		
 		// Z : déplacement aléatoire
 		step = maxStep;
 		if (getRocketNumber() < 10)
@@ -633,5 +732,28 @@ public class TestHitter extends Brain{
 			move();
 		}
 		return;
+	}
+	
+	/* Fetches angle relative to screen centre point
+	 * where 3 O'Clock is 0 and 12 O'Clock is 270 degrees
+	 * 
+	 * @param screenPoint
+	 * @return angle in degress from 0-360.
+	 */
+	public double getAngle(Point2D screenPoint)
+	{
+	    double dx = screenPoint.getX();
+	    // Minus to correct for coord re-mapping
+	    double dy = -(screenPoint.getY());
+
+	    double inRads = Math.atan2(dy,dx);
+
+	    // We need to map to coord system when 0 degree is at 3 O'clock, 270 at 12 O'clock
+	    if (inRads < 0)
+	        inRads = Math.abs(inRads);
+	    else
+	        inRads = 2*Math.PI - inRads;
+
+	    return Math.toDegrees(inRads);
 	}
 }
