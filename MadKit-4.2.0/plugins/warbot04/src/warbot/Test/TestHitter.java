@@ -100,7 +100,7 @@ public class TestHitter extends Brain{
 
 		for (int i = 0; i < percepts.length; i++) {
 			Percept currentPercept = percepts[i];
-			if (currentPercept.getPerceptType() == "Obstacle")
+			if (currentPercept.getPerceptType().equals("Obstacle"))
 			{
 				uncrossables.add(currentPercept);
 			}
@@ -569,21 +569,6 @@ public class TestHitter extends Brain{
 			}
 		}
 
-		if (baseAlive && getRocketNumber() == 0) {
-			if (myhome != null && distanceTo(myhome) < 2) {
-				reloadRocket();
-				setHeading(towards(-myhome.getX(), -myhome.getY()));
-				return;
-			} else {
-				if (!isMoving())
-					randomHeading();
-				else
-					setHeading(towards(homeX, homeY));
-				move();
-				return;
-			}
-		}
-
 		for (int i = 0; i < percepts.length; i++) // pour toutes les entités
 													// perçues...
 		{
@@ -906,7 +891,7 @@ public class TestHitter extends Brain{
 			return;
 		}
 		
-		if (tabAttackLeader[0] != 0 && tabAttackLeader[1] != 0 && (role == HitterRole.squad_left || role == HitterRole.squad_right))
+		/*if (tabAttackLeader[0] != 0 && tabAttackLeader[1] != 0 && (role == HitterRole.squad_left || role == HitterRole.squad_right))
 		{
 			// demande aide
 			argMessageX = Double.toString(tabAttackLeader[0]);
@@ -914,7 +899,7 @@ public class TestHitter extends Brain{
 			// tire
 			gestionHit(towards(tabAttackLeader[0], tabAttackLeader[1]), tailleMyTeam,
 					tabMyTeam);
-		}
+		}*/
 
 		// Y : rejoindre ami perçu
 		for (int i = 0; i < percepts.length; i++) // pour toutes les entités

@@ -2,13 +2,13 @@
 from java.util import Random
 from java.util import Vector
 from java.lang import Math
-from warbot.BPV_team import Point
-from warbot.BPV_team import Assistance
-from warbot.BPV_team import Cible
-from warbot.BPV_team import Compteur
-from warbot.BPV_team import Mobile
-from warbot.BPV_team import Rocket
-from warbot.BPV_team import Groupe
+from warbot.BPV_Team import Point
+from warbot.BPV_Team import Assistance
+from warbot.BPV_Team import Cible
+from warbot.BPV_Team import Compteur
+from warbot.BPV_Team import Mobile
+from warbot.BPV_Team import Rocket
+from warbot.BPV_Team import Groupe
 
 rnd = Random()
 

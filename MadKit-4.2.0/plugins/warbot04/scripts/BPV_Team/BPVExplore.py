@@ -2,10 +2,10 @@
 
 from java.lang import Math
 from java.util import Random
-from warbot.BPV_team import Point
-from warbot.BPV_team import Rocket
-from warbot.BPV_team import Cible
-from warbot.BPV_team import Compteur
+from warbot.BPV_Team import Point
+from warbot.BPV_Team import Rocket
+from warbot.BPV_Team import Cible
+from warbot.BPV_Team import Compteur
 
 rnd=Random()
 

@@ -13,7 +13,7 @@ public class Hitter extends BasicBody{
 public Hitter(WarbotEnvironment env,Brain b,String team)
 {
 	super(env,b,"hitter",team,15,8000,45);
-	setSpeed(1);
+	setSpeed(2);
 	rocketNb = maximumRocket;
 }
 
@@ -21,7 +21,7 @@ public Hitter()
 {
     super();
 	setDetectingRange(45);
-	setSpeed(1);
+	setSpeed(2);
 	maximumEnergy=8000;
 	rocketNb = maximumRocket;
 }
