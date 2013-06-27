@@ -578,8 +578,9 @@ public class TestRocketLauncher extends Brain {
 				}
 				if (currentMsg.getAct() != null
 						&& currentMsg.getAct() == Constants.MSG_ATTACKLEADER) {
-					tabAttackLeader[0] = Double.valueOf(currentMsg.getArg1());
-					tabAttackLeader[1] = Double.valueOf(currentMsg.getArg2());
+					tabAttackLeader[0] = Double.valueOf(currentMsg.getArg1())+currentMsg.getFromX();
+					tabAttackLeader[1] = Double.valueOf(currentMsg.getArg2())+currentMsg.getFromY();
+					System.out.println("AttackLeader : "+tabAttackLeader[0]+","+tabAttackLeader[1]);
 				}
 				if (currentMsg.getAct() != null
 						&& currentMsg.getAct() == Constants.MSG_LEADERBASEPOS) {
@@ -743,18 +744,13 @@ public class TestRocketLauncher extends Brain {
 		tailleMyTeam = comptMyTeam;
 		comptMyTeam = 0;
 		// fin récupération et classement des objets perçus
-		if (attack.equals(RocketLauncherAttack.rocket)) {
-			// on ordonne les actions principalement en fonction des objets
-			// perçus
-			// et des messages reçus
-			if (tabRocket[2] != 0) {
+					if (tabRocket[2] != 0) {
 				setUserMessage("detect rocket");
 				for (int j = 0; j < percepts.length; j++) {
 					Percept currentPercept2 = percepts[j];
 					if ((getHeading()
 							- (towards(currentPercept2.getX(), tabRocket[1])) >= 20)
-							&& (currentPercept2.getPerceptType()
-									.equals("Obstacle"))) {
+							&& (currentPercept2.getPerceptType().equals("Obstacle"))) {
 						if (step == 0) {
 							step++;
 							setHeading(towards(-tabRocket[0] / 2, -tabRocket[1]));
@@ -780,6 +776,7 @@ public class TestRocketLauncher extends Brain {
 				move();
 				return;
 			}
+		if (attack.equals(RocketLauncherAttack.rocket)) {
 			// A : une base ennemie est à portée et le launcher est en position
 			// de
 			// tirer et/ou de se sacrifier
@@ -943,27 +940,6 @@ public class TestRocketLauncher extends Brain {
 				return;
 			}
 
-			if (tabAttackLeader[0] != 0
-					&& tabAttackLeader[1] != 0
-					&& (role == RocketLauncherRole.squad_left || role == RocketLauncherRole.squad_right)) {
-				// demande aide
-				argMessageX = Double.toString(tabAttackLeader[0]);
-				argMessageY = Double.toString(tabAttackLeader[1]);
-				// tire
-				gestionTir(towards(tabAttackLeader[0], tabAttackLeader[1]),
-						tailleMyTeam, tabMyTeam);
-			}
-
-			/*
-			 * if (tabAttackLeader[0] != 0 && tabAttackLeader[1] != 0 && (role
-			 * == RocketLauncherRole.squad_left || role ==
-			 * RocketLauncherRole.squad_right)) { // demande aide argMessageX =
-			 * Double.toString(tabAttackLeader[0]); argMessageY =
-			 * Double.toString(tabAttackLeader[1]); // tire
-			 * gestionTir(towards(tabAttackLeader[0], tabAttackLeader[1]),
-			 * tailleMyTeam, tabMyTeam); }
-			 */
-
 			// Y : rejoindre ami perçu
 			for (int i = 0; i < percepts.length; i++) // pour toutes les entités
 			// perçues...
@@ -1012,38 +988,6 @@ public class TestRocketLauncher extends Brain {
 			}
 		}
 		else{
-			if (tabRocket[2] != 0) {
-				setUserMessage("detect rocket");
-				for (int j = 0; j < percepts.length; j++) {
-					Percept currentPercept2 = percepts[j];
-					if ((getHeading()
-							- (towards(currentPercept2.getX(), tabRocket[1])) >= 20)
-							&& (currentPercept2.getPerceptType().equals("Obstacle"))) {
-						if (step == 0) {
-							step++;
-							setHeading(towards(-tabRocket[0] / 2, -tabRocket[1]));
-						} else {
-							if (step == maxStep)
-								step = 0;
-							else
-								step++;
-						}
-						move();
-						return;
-					}
-				}
-				int rand = (new Random()).nextInt() % 4;
-				if (rand == 0)
-					setHeading(towards(tabRocket[0], -tabRocket[1])); // direction
-				else if (rand == 1)
-					setHeading(towards(-tabRocket[0], tabRocket[1])); // direction
-				else if (rand == 2)
-					setHeading(towards(-tabRocket[0], -tabRocket[1] / 2)); // direction
-				else
-					setHeading(towards(-tabRocket[0] / 2, -tabRocket[1])); // direction
-				move();
-				return;
-			}
 			// A : une base ennemie est à portée et le launcher est en position de
 			// tirer et/ou de se sacrifier
 			if (tabBase[2] != 0 && tabBase[3] != 0) {
@@ -1232,7 +1176,7 @@ public class TestRocketLauncher extends Brain {
 				return;
 			}
 			
-			/*if (tabAttackLeader[0] != 0 && tabAttackLeader[1] != 0 && (role == RocketLauncherRole.squad_left || role == RocketLauncherRole.squad_right))
+			if (tabAttackLeader[0] != 0 && tabAttackLeader[1] != 0 && (role == RocketLauncherRole.squad_left || role == RocketLauncherRole.squad_right))
 			{
 				// demande aide
 				argMessageX = Double.toString(tabAttackLeader[0]);
@@ -1240,7 +1184,7 @@ public class TestRocketLauncher extends Brain {
 				// tire
 				gestionHit(towards(tabAttackLeader[0], tabAttackLeader[1]), tailleMyTeam,
 						tabMyTeam);
-			}*/
+			}
 
 			// Y : rejoindre ami perçu
 			for (int i = 0; i < percepts.length; i++) // pour toutes les entités
@@ -1274,15 +1218,19 @@ public class TestRocketLauncher extends Brain {
 			
 			// Z : déplacement aléatoire
 			step = maxStep;
-			// Z : déplacement aléatoire
-			if (!isMoving())
-				randomHeading();
-			// Follow the squad leader
-			else if (role == RocketLauncherRole.squad_left
-					|| role == RocketLauncherRole.squad_right) {
-				followTheLeader();
+			if (getRocketNumber() < 10)
+				buildRocket();
+			else {
+				// Z : déplacement aléatoire
+				if (!isMoving())
+					randomHeading();
+				// Follow the squad leader
+				else if (role == RocketLauncherRole.squad_left
+						|| role == RocketLauncherRole.squad_right) {
+					followTheLeader();
+				}
+				move();
 			}
-			move();
 		}
 		return;
 	}

@@ -122,13 +122,13 @@ public class TestExplorer extends Brain {
 	    println("ID Dead (me-explorer) : "+getAddress().getLocalID());
 	}
 	
-	private void avoidance(Percept[] percepts) {
+	private boolean avoidance(Percept[] percepts) {
 		
 		ArrayList<Percept> uncrossables = new ArrayList<Percept>();
 
 		for (int i = 0; i < percepts.length; i++) {
 			Percept currentPercept = percepts[i];
-			if (!currentPercept.getPerceptType().equals("Obstacle") && !currentPercept.getPerceptType().equals("Food") && distanceTo(currentPercept) < 8)
+			if (!currentPercept.getPerceptType().equals("Obstacle") && !currentPercept.getPerceptType().equals("Food") && !currentPercept.getPerceptType().equals("Home") && distanceTo(currentPercept) < 10)
 			{
 				uncrossables.add(currentPercept);
 			}
@@ -187,7 +187,9 @@ public class TestExplorer extends Brain {
 				}
 			}
 			lastCenter = center;
+			return true;
 		}
+		return false;
 	}
 	
 	public void doIt() {
@@ -255,7 +257,10 @@ public class TestExplorer extends Brain {
 			if (!isMoving())
 				avoidance(percepts);
 			else
-				setHeading(towards(homeX, homeY));
+			{
+				if (!avoidance(percepts))
+					setHeading(towards(homeX, homeY));
+			}
 			setUserMessage("going to base");
 			move();
 			return;
