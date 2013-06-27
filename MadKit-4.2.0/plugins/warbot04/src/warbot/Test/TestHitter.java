@@ -46,6 +46,8 @@ public class TestHitter extends Brain{
 	private int wantingToBeALeader = 0;
 	
 	private HitterRole role;
+	
+	boolean attackleader = false;
 
 	public TestHitter() {
 		squadMembers = new HashMap<String, AgentAddress>();
@@ -200,13 +202,24 @@ public class TestHitter extends Brain{
 		{
 			decal = -decal;
 		}
-    	double[] pt = {leaderPosition.getX() - 30, leaderPosition.getY() - decal};
+		if (!attackleader)
+		{
+		double[] pt = { leaderPosition.getX() - 30,
+				leaderPosition.getY() - decal };
 		AffineTransform.getRotateInstance(Math.toRadians(leaderHeading),
-										  leaderPosition.getX(),
-										  leaderPosition.getY())
-										  	.transform(pt, 0, pt, 0, 1);
+				leaderPosition.getX(), leaderPosition.getY()).transform(pt, 0,
+				pt, 0, 1);
 		setHeading(towards(pt[0], pt[1]));
-		setUserMessage((decal == 50) ? "sqad_left" : "squad_right");
+		}
+		else
+		{
+			double[] pt = { leaderPosition.getX() + 30,
+					leaderPosition.getY() - decal };
+			AffineTransform.getRotateInstance(Math.toRadians(leaderHeading),
+					leaderPosition.getX(), leaderPosition.getY()).transform(pt, 0,
+					pt, 0, 1);
+			setHeading(towards(pt[0], pt[1]));
+		}
 	}
 	
 	public void doIt() {
@@ -321,6 +334,7 @@ public class TestHitter extends Brain{
 		int seuilEnergieBase = 6000; // énergie seuil pour "se défendre" vs
 										// "se sacrifier"
 		boolean baseAlive = false;
+		attackleader = false;
 		
 		// send messages to form a squad
 				if (role == HitterRole.alone) {
@@ -525,6 +539,7 @@ public class TestHitter extends Brain{
 						{
 							tabAttackLeader[0] = Double.valueOf(currentMsg.getArg1());
 							tabAttackLeader[1] = Double.valueOf(currentMsg.getArg2());
+							attackleader = true;
 						}
 						if (currentMsg.getAct() != null && currentMsg.getAct() == Constants.MSG_LEADERBASEPOS)
 						{

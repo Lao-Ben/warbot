@@ -44,6 +44,8 @@ public class TestRocketLauncher extends Brain {
 
 	private RocketLauncherRole role;
 	private RocketLauncherAttack attack;
+	
+	boolean attackleader = false;
 
 	public TestRocketLauncher() {
 		squadMembers = new HashMap<String, AgentAddress>();
@@ -168,12 +170,24 @@ public class TestRocketLauncher extends Brain {
 		if (role == RocketLauncherRole.squad_right) {
 			decal = -decal;
 		}
+		if (!attackleader)
+		{
 		double[] pt = { leaderPosition.getX() - 30,
 				leaderPosition.getY() - decal };
 		AffineTransform.getRotateInstance(Math.toRadians(leaderHeading),
 				leaderPosition.getX(), leaderPosition.getY()).transform(pt, 0,
 				pt, 0, 1);
 		setHeading(towards(pt[0], pt[1]));
+		}
+		else
+		{
+			double[] pt = { leaderPosition.getX() + 30,
+					leaderPosition.getY() - decal };
+			AffineTransform.getRotateInstance(Math.toRadians(leaderHeading),
+					leaderPosition.getX(), leaderPosition.getY()).transform(pt, 0,
+					pt, 0, 1);
+			setHeading(towards(pt[0], pt[1]));
+		}
 		setUserMessage((decal == 50) ? "sqad_left" : "squad_right");
 	}
 
@@ -342,6 +356,8 @@ public class TestRocketLauncher extends Brain {
 		int seuilEnergieBase = 6000; // énergie seuil pour "se défendre" vs
 		// "se sacrifier"
 		boolean baseAlive = false;
+		
+		attackleader = false;
 
 		println("ROLE ::::: " + role);
 
@@ -580,7 +596,7 @@ public class TestRocketLauncher extends Brain {
 						&& currentMsg.getAct() == Constants.MSG_ATTACKLEADER) {
 					/*tabAttackLeader[0] = Double.valueOf(currentMsg.getArg1())+currentMsg.getFromX();
 					tabAttackLeader[1] = Double.valueOf(currentMsg.getArg2())+currentMsg.getFromY();*/
-					//attackLeader = true;
+					attackleader = true;
 					//System.out.println("AttackLeader : "+tabAttackLeader[0]+","+tabAttackLeader[1]);
 				}
 				if (currentMsg.getAct() != null
@@ -911,7 +927,7 @@ public class TestRocketLauncher extends Brain {
 				argMessageY = Double.toString(tabExplorer[1]);
 				setUserMessage("ATTACK");
 				// tire
-				gestionTir(towards(tabLauncher[0], tabLauncher[1]),
+				gestionTir(towards(tabExplorer[0], tabExplorer[1]),
 						tailleMyTeam, tabMyTeam);
 				if (role == RocketLauncherRole.squad_leader) {
 					send(squadMembers.get("left"), Constants.MSG_ATTACKLEADER,
