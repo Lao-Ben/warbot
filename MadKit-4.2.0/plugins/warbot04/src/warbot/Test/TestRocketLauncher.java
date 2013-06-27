@@ -306,7 +306,7 @@ public class TestRocketLauncher extends Brain {
 		// distance de la base ennemie ayant
 		// le moins d'énergie tout en étant
 		// la plus proche
-		double[] tabAttackLeader = new double[2];
+		//double[] tabAttackLeader = new double[2];
 		int comptMyTeam = 0; // compteur du tableau tabMyTeam
 		int tailleMyTeam = 0; // taille finale du tableau tabMyTeam
 		// initialisation de l'énergie et de la distance dans les tableaux des
@@ -578,9 +578,10 @@ public class TestRocketLauncher extends Brain {
 				}
 				if (currentMsg.getAct() != null
 						&& currentMsg.getAct() == Constants.MSG_ATTACKLEADER) {
-					tabAttackLeader[0] = Double.valueOf(currentMsg.getArg1())+currentMsg.getFromX();
-					tabAttackLeader[1] = Double.valueOf(currentMsg.getArg2())+currentMsg.getFromY();
-					System.out.println("AttackLeader : "+tabAttackLeader[0]+","+tabAttackLeader[1]);
+					/*tabAttackLeader[0] = Double.valueOf(currentMsg.getArg1())+currentMsg.getFromX();
+					tabAttackLeader[1] = Double.valueOf(currentMsg.getArg2())+currentMsg.getFromY();*/
+					//attackLeader = true;
+					//System.out.println("AttackLeader : "+tabAttackLeader[0]+","+tabAttackLeader[1]);
 				}
 				if (currentMsg.getAct() != null
 						&& currentMsg.getAct() == Constants.MSG_LEADERBASEPOS) {
@@ -1176,7 +1177,7 @@ public class TestRocketLauncher extends Brain {
 				return;
 			}
 			
-			if (tabAttackLeader[0] != 0 && tabAttackLeader[1] != 0 && (role == RocketLauncherRole.squad_left || role == RocketLauncherRole.squad_right))
+			/*if (tabAttackLeader[0] != 0 && tabAttackLeader[1] != 0 && (role == RocketLauncherRole.squad_left || role == RocketLauncherRole.squad_right))
 			{
 				// demande aide
 				argMessageX = Double.toString(tabAttackLeader[0]);
@@ -1184,7 +1185,7 @@ public class TestRocketLauncher extends Brain {
 				// tire
 				gestionHit(towards(tabAttackLeader[0], tabAttackLeader[1]), tailleMyTeam,
 						tabMyTeam);
-			}
+			}*/
 
 			// Y : rejoindre ami perçu
 			for (int i = 0; i < percepts.length; i++) // pour toutes les entités
