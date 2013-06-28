@@ -990,9 +990,9 @@ public class TestRocketLauncher extends Brain {
 				avoidance(percepts);
 
 			step = maxStep;
-			if (getRocketNumber() < 10)
+			/*if (getRocketNumber() < 10)
 				buildRocket();
-			else {
+			else {*/
 				// Z : déplacement aléatoire
 				if (!isMoving())
 					randomHeading();
@@ -1002,7 +1002,7 @@ public class TestRocketLauncher extends Brain {
 					followTheLeader();
 				}
 				move();
-			}
+			//}
 		}
 		else{
 			// A : une base ennemie est à portée et le launcher est en position de
@@ -1235,9 +1235,9 @@ public class TestRocketLauncher extends Brain {
 			
 			// Z : déplacement aléatoire
 			step = maxStep;
-			if (getRocketNumber() < 10)
+			/*if (getRocketNumber() < 10)
 				buildRocket();
-			else {
+			else {*/
 				// Z : déplacement aléatoire
 				if (!isMoving())
 					randomHeading();
@@ -1247,7 +1247,7 @@ public class TestRocketLauncher extends Brain {
 					followTheLeader();
 				}
 				move();
-			}
+			//}
 		}
 		return;
 	}
